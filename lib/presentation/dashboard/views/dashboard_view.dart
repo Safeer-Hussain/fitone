@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_mobx/flutter_mobx.dart';
-import '../../../core/constants/app_colors.dart';
 import '../../../core/di/injection.dart';
+import '../../../core/theme/theme_store.dart';
 import '../stores/dashboard_store.dart';
 import '../widgets/device_manager_sheet.dart';
 import '../widgets/ecg_waveform_card.dart';
@@ -18,11 +18,13 @@ class DashboardView extends StatefulWidget {
 
 class _DashboardViewState extends State<DashboardView> {
   late final DashboardStore _store;
+  late final ThemeStore _themeStore;
 
   @override
   void initState() {
     super.initState();
     _store = sl<DashboardStore>();
+    _themeStore = sl<ThemeStore>();
     _store.initialize();
   }
 
@@ -30,6 +32,11 @@ class _DashboardViewState extends State<DashboardView> {
   Widget build(BuildContext context) {
     return Observer(
       builder: (_) {
+        // Explicitly observe themeStore so rebuild is triggered immediately on theme toggle
+        final _ = _themeStore.themeMode;
+        final theme = Theme.of(context);
+        final colorScheme = theme.colorScheme;
+
         final telemetry = _store.activeTelemetry;
         final connected = _store.connectedDevice;
         final hr = telemetry?.heartRate ?? 72;
@@ -41,6 +48,7 @@ class _DashboardViewState extends State<DashboardView> {
         final readiness = _store.readinessScore;
 
         return Scaffold(
+          backgroundColor: theme.scaffoldBackgroundColor,
           body: OrientationBuilder(
             builder: (context, orientation) {
               final isLandscape = orientation == Orientation.landscape;
@@ -54,9 +62,10 @@ class _DashboardViewState extends State<DashboardView> {
                       Expanded(
                         flex: 4,
                         child: SingleChildScrollView(
+                          physics: const ClampingScrollPhysics(),
                           child: Column(
                             children: [
-                              _buildDeviceHeader(connected),
+                              _buildDeviceHeader(context, connected, colorScheme),
                               const SizedBox(height: 12),
                               ReadinessRing(
                                 score: readiness,
@@ -71,6 +80,7 @@ class _DashboardViewState extends State<DashboardView> {
                       Expanded(
                         flex: 6,
                         child: SingleChildScrollView(
+                          physics: const ClampingScrollPhysics(),
                           child: Column(
                             children: [
                               EcgWaveformCard(
@@ -94,9 +104,10 @@ class _DashboardViewState extends State<DashboardView> {
               }
 
               return ListView(
+                physics: const ClampingScrollPhysics(),
                 padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
                 children: [
-                  _buildDeviceHeader(connected),
+                  _buildDeviceHeader(context, connected, colorScheme),
                   const SizedBox(height: 14),
                   ReadinessRing(
                     score: readiness,
@@ -125,23 +136,23 @@ class _DashboardViewState extends State<DashboardView> {
     );
   }
 
-  Widget _buildDeviceHeader(dynamic connected) {
+  Widget _buildDeviceHeader(BuildContext context, dynamic connected, ColorScheme colorScheme) {
     return GestureDetector(
       onTap: () => DeviceManagerSheet.show(context, _store),
       child: Container(
         padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
         decoration: BoxDecoration(
-          color: AppColors.darkSurface,
+          color: colorScheme.surface,
           borderRadius: BorderRadius.circular(14),
-          border: Border.all(color: AppColors.darkBorder),
+          border: Border.all(color: colorScheme.outlineVariant),
         ),
         child: Row(
           children: [
             Container(
               width: 10,
               height: 10,
-              decoration: const BoxDecoration(
-                color: AppColors.emeraldPrimary,
+              decoration: BoxDecoration(
+                color: colorScheme.primary,
                 shape: BoxShape.circle,
               ),
             ),
@@ -152,18 +163,29 @@ class _DashboardViewState extends State<DashboardView> {
                 children: [
                   Text(
                     connected != null ? connected.name : 'AuraRing Pro v2',
-                    style: const TextStyle(fontWeight: FontWeight.w700, fontSize: 14, color: Colors.white),
+                    style: TextStyle(
+                      fontWeight: FontWeight.w700,
+                      fontSize: 14,
+                      color: colorScheme.onSurface,
+                    ),
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
                   ),
                   Text(
                     connected != null
                         ? 'Connected via ${connected.sdk} • 99% packet fidelity'
                         : 'Connected via SDK_A • 99% packet fidelity',
-                    style: const TextStyle(fontSize: 11, color: AppColors.darkTextSecondary),
+                    style: TextStyle(
+                      fontSize: 11,
+                      color: colorScheme.onSurfaceVariant,
+                    ),
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
                   ),
                 ],
               ),
             ),
-            const Icon(Icons.tune_rounded, size: 18, color: AppColors.emeraldPrimary),
+            Icon(Icons.tune_rounded, size: 18, color: colorScheme.primary),
           ],
         ),
       ),

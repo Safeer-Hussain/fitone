@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import '../../../core/constants/app_colors.dart';
 import '../stores/nutrition_store.dart';
 
 class HydrationTrackerCard extends StatelessWidget {
@@ -9,6 +8,8 @@ class HydrationTrackerCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final colorScheme = theme.colorScheme;
     final summary = store.dailySummary;
     final consumedMl = summary?.consumedWaterMl ?? 0;
     final targetMl = summary?.targetWaterMl ?? 3000;
@@ -16,6 +17,11 @@ class HydrationTrackerCard extends StatelessWidget {
     final streak = store.waterStreakDays;
 
     return Card(
+      color: colorScheme.surface,
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(16),
+        side: BorderSide(color: colorScheme.outlineVariant),
+      ),
       child: Padding(
         padding: const EdgeInsets.all(20),
         child: Column(
@@ -24,17 +30,17 @@ class HydrationTrackerCard extends StatelessWidget {
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                const Row(
+                Row(
                   children: [
-                    Icon(Icons.water_drop_rounded, size: 16, color: AppColors.cyanAccent),
-                    SizedBox(width: 8),
+                    Icon(Icons.water_drop_rounded, size: 16, color: colorScheme.secondary),
+                    const SizedBox(width: 8),
                     Text(
                       'HYDRATION ENGINE',
                       style: TextStyle(
                         fontSize: 12,
                         fontWeight: FontWeight.w700,
                         letterSpacing: 0.8,
-                        color: AppColors.darkTextSecondary,
+                        color: colorScheme.onSurfaceVariant,
                       ),
                     ),
                   ],
@@ -42,14 +48,14 @@ class HydrationTrackerCard extends StatelessWidget {
                 Container(
                   padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
                   decoration: BoxDecoration(
-                    color: AppColors.cyanAccent.withOpacity(0.15),
+                    color: colorScheme.secondary.withValues(alpha: 0.15),
                     borderRadius: BorderRadius.circular(8),
-                    border: Border.all(color: AppColors.cyanAccent.withOpacity(0.3)),
+                    border: Border.all(color: colorScheme.secondary.withValues(alpha: 0.3)),
                   ),
                   child: Text(
                     '$streak Day Streak',
-                    style: const TextStyle(
-                      color: AppColors.cyanAccent,
+                    style: TextStyle(
+                      color: colorScheme.secondary,
                       fontSize: 11,
                       fontWeight: FontWeight.w700,
                     ),
@@ -66,17 +72,17 @@ class HydrationTrackerCard extends StatelessWidget {
                   children: [
                     Text(
                       '$consumedMl ml',
-                      style: const TextStyle(fontSize: 24, fontWeight: FontWeight.w800, color: Colors.white),
+                      style: TextStyle(fontSize: 24, fontWeight: FontWeight.w800, color: colorScheme.onSurface),
                     ),
                     Text(
                       'Target $targetMl ml per day',
-                      style: const TextStyle(fontSize: 12, color: AppColors.darkTextSecondary),
+                      style: TextStyle(fontSize: 12, color: colorScheme.onSurfaceVariant),
                     ),
                   ],
                 ),
                 Text(
                   '${(progress * 100).toInt()}%',
-                  style: const TextStyle(fontSize: 20, fontWeight: FontWeight.w800, color: AppColors.cyanAccent),
+                  style: TextStyle(fontSize: 20, fontWeight: FontWeight.w800, color: colorScheme.secondary),
                 ),
               ],
             ),
@@ -86,22 +92,22 @@ class HydrationTrackerCard extends StatelessWidget {
               child: LinearProgressIndicator(
                 value: progress,
                 minHeight: 10,
-                backgroundColor: AppColors.darkSurfaceElevated,
-                valueColor: const AlwaysStoppedAnimation(AppColors.cyanAccent),
+                backgroundColor: colorScheme.surfaceContainerHighest,
+                valueColor: AlwaysStoppedAnimation(colorScheme.secondary),
               ),
             ),
             const SizedBox(height: 18),
             Row(
               children: [
-                _WaterButton(label: '+250ml', onTap: () => store.logWater(250)),
+                _WaterButton(label: '+250ml', onTap: () => store.logWater(250), colorScheme: colorScheme),
                 const SizedBox(width: 8),
-                _WaterButton(label: '+500ml', onTap: () => store.logWater(500)),
+                _WaterButton(label: '+500ml', onTap: () => store.logWater(500), colorScheme: colorScheme),
                 const SizedBox(width: 8),
-                _WaterButton(label: '+750ml', onTap: () => store.logWater(750)),
+                _WaterButton(label: '+750ml', onTap: () => store.logWater(750), colorScheme: colorScheme),
                 const SizedBox(width: 8),
                 IconButton(
                   onPressed: () => store.resetHydration(),
-                  icon: const Icon(Icons.refresh_rounded, size: 18, color: AppColors.darkTextMuted),
+                  icon: Icon(Icons.refresh_rounded, size: 18, color: colorScheme.onSurfaceVariant),
                   tooltip: 'Reset Day Hydration',
                 ),
               ],
@@ -116,8 +122,9 @@ class HydrationTrackerCard extends StatelessWidget {
 class _WaterButton extends StatelessWidget {
   final String label;
   final VoidCallback onTap;
+  final ColorScheme colorScheme;
 
-  const _WaterButton({required this.label, required this.onTap});
+  const _WaterButton({required this.label, required this.onTap, required this.colorScheme});
 
   @override
   Widget build(BuildContext context) {
@@ -125,8 +132,8 @@ class _WaterButton extends StatelessWidget {
       child: OutlinedButton(
         onPressed: onTap,
         style: OutlinedButton.styleFrom(
-          foregroundColor: Colors.white,
-          side: const BorderSide(color: AppColors.darkBorder),
+          foregroundColor: colorScheme.onSurface,
+          side: BorderSide(color: colorScheme.outlineVariant),
           padding: const EdgeInsets.symmetric(vertical: 8),
           shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
         ),

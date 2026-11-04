@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_mobx/flutter_mobx.dart';
-import '../../../core/constants/app_colors.dart';
 import '../../../core/di/injection.dart';
+import '../../../core/theme/theme_store.dart';
 import '../../../core/widgets/error_retry_view.dart';
 import '../../../core/widgets/shimmer_loader.dart';
 import '../stores/exercise_store.dart';
@@ -18,6 +18,7 @@ class ExerciseEncyclopediaView extends StatefulWidget {
 
 class _ExerciseEncyclopediaViewState extends State<ExerciseEncyclopediaView> {
   late final ExerciseStore _store;
+  final ThemeStore _themeStore = sl<ThemeStore>();
   final TextEditingController _searchController = TextEditingController();
 
   @override
@@ -35,54 +36,66 @@ class _ExerciseEncyclopediaViewState extends State<ExerciseEncyclopediaView> {
 
   @override
   Widget build(BuildContext context) {
-    return DefaultTabController(
-      length: 2,
-      child: Scaffold(
-        appBar: AppBar(
-          title: const Text('Exercise Encyclopedia & Programs'),
-          bottom: const TabBar(
-            indicatorColor: AppColors.emeraldPrimary,
-            labelColor: AppColors.emeraldPrimary,
-            unselectedLabelColor: AppColors.darkTextMuted,
-            tabs: [
-              Tab(text: 'Encyclopedia (60+)'),
-              Tab(text: 'Routines & Plans'),
-            ],
-          ),
-          actions: [
-            IconButton(
+    return Observer(
+      builder: (_) {
+        final _ = _themeStore.themeMode;
+        final theme = Theme.of(context);
+        final colorScheme = theme.colorScheme;
+
+        return DefaultTabController(
+          length: 2,
+          child: Scaffold(
+            appBar: AppBar(
+              title: const Text('Exercise Encyclopedia & Programs'),
+              bottom: TabBar(
+                indicatorColor: colorScheme.primary,
+                labelColor: colorScheme.primary,
+                unselectedLabelColor: colorScheme.onSurfaceVariant,
+                tabs: const [
+                  Tab(text: 'Encyclopedia (60+)'),
+                  Tab(text: 'Routines & Plans'),
+                ],
+              ),
+              actions: [
+                IconButton(
+                  onPressed: () {
+                    Navigator.of(context).push(
+                      MaterialPageRoute(builder: (_) => const WorkoutLoggerView()),
+                    );
+                  },
+                  icon: Icon(Icons.fitness_center_rounded, color: colorScheme.primary),
+                  tooltip: 'Launch Active Logger',
+                ),
+              ],
+            ),
+            body: TabBarView(
+              children: [
+                _buildEncyclopediaTab(context),
+                _buildWorkoutPlansTab(context),
+              ],
+            ),
+            floatingActionButton: FloatingActionButton.extended(
               onPressed: () {
                 Navigator.of(context).push(
                   MaterialPageRoute(builder: (_) => const WorkoutLoggerView()),
                 );
               },
-              icon: const Icon(Icons.fitness_center_rounded, color: AppColors.emeraldPrimary),
-              tooltip: 'Launch Active Logger',
+              backgroundColor: colorScheme.primary,
+              foregroundColor: colorScheme.onPrimary,
+              icon: const Icon(Icons.play_arrow_rounded),
+              label: const Text('Start Workout', style: TextStyle(fontWeight: FontWeight.w700)),
             ),
-          ],
-        ),
-        body: TabBarView(
-          children: [
-            _buildEncyclopediaTab(),
-            _buildWorkoutPlansTab(),
-          ],
-        ),
-        floatingActionButton: FloatingActionButton.extended(
-          onPressed: () {
-            Navigator.of(context).push(
-              MaterialPageRoute(builder: (_) => const WorkoutLoggerView()),
-            );
-          },
-          backgroundColor: AppColors.emeraldPrimary,
-          foregroundColor: Colors.black,
-          icon: const Icon(Icons.play_arrow_rounded),
-          label: const Text('Start Workout', style: TextStyle(fontWeight: FontWeight.w700)),
-        ),
-      ),
+          ),
+        );
+      },
     );
   }
 
-  Widget _buildEncyclopediaTab() {
+  Widget _buildEncyclopediaTab(BuildContext context) {
+    final theme = Theme.of(context);
+    final colorScheme = theme.colorScheme;
+    final isLandscape = MediaQuery.of(context).orientation == Orientation.landscape;
+
     return Column(
       children: [
         Padding(
@@ -92,7 +105,7 @@ class _ExerciseEncyclopediaViewState extends State<ExerciseEncyclopediaView> {
             onChanged: _store.onSearchChanged,
             decoration: InputDecoration(
               hintText: 'Search 60+ exercises or target muscles...',
-              prefixIcon: const Icon(Icons.search_rounded, color: AppColors.darkTextMuted),
+              prefixIcon: Icon(Icons.search_rounded, color: colorScheme.onSurfaceVariant),
               suffixIcon: _searchController.text.isNotEmpty
                   ? IconButton(
                       icon: const Icon(Icons.clear, size: 18),
@@ -105,7 +118,6 @@ class _ExerciseEncyclopediaViewState extends State<ExerciseEncyclopediaView> {
             ),
           ),
         ),
-        // Body part horizontal selector
         SizedBox(
           height: 38,
           child: Observer(
@@ -130,7 +142,6 @@ class _ExerciseEncyclopediaViewState extends State<ExerciseEncyclopediaView> {
           ),
         ),
         const SizedBox(height: 8),
-        // Equipment horizontal selector
         SizedBox(
           height: 38,
           child: Observer(
@@ -180,8 +191,37 @@ class _ExerciseEncyclopediaViewState extends State<ExerciseEncyclopediaView> {
 
               final exercises = _store.exercises;
               if (exercises.isEmpty) {
-                return const Center(
-                  child: Text('No exercises found matching criteria.', style: TextStyle(color: AppColors.darkTextMuted)),
+                return Center(
+                  child: Text(
+                    'No exercises found matching criteria.',
+                    style: TextStyle(color: colorScheme.onSurfaceVariant),
+                  ),
+                );
+              }
+
+              if (isLandscape) {
+                final screenWidth = MediaQuery.of(context).size.width;
+                final crossAxisCount = screenWidth > 900 ? 4 : 3;
+                return GridView.builder(
+                  padding: const EdgeInsets.all(16),
+                  gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+                    crossAxisCount: crossAxisCount,
+                    childAspectRatio: 2.1,
+                    crossAxisSpacing: 12,
+                    mainAxisSpacing: 12,
+                  ),
+                  itemCount: exercises.length,
+                  itemBuilder: (context, index) {
+                    final ex = exercises[index];
+                    return ExerciseCard(
+                      exercise: ex,
+                      onTap: () {
+                        Navigator.of(context).push(
+                          MaterialPageRoute(builder: (_) => ExerciseDetailView(exercise: ex)),
+                        );
+                      },
+                    );
+                  },
                 );
               }
 
@@ -207,24 +247,27 @@ class _ExerciseEncyclopediaViewState extends State<ExerciseEncyclopediaView> {
     );
   }
 
-  Widget _buildWorkoutPlansTab() {
+  Widget _buildWorkoutPlansTab(BuildContext context) {
+    final theme = Theme.of(context);
+    final colorScheme = theme.colorScheme;
+    final isLandscape = MediaQuery.of(context).orientation == Orientation.landscape;
+
     return Observer(
       builder: (_) {
         final plans = _store.workoutPlans;
         if (plans.isEmpty) {
-          return const Center(child: Text('No workout plans loaded.', style: TextStyle(color: AppColors.darkTextMuted)));
+          return Center(
+            child: Text('No workout plans loaded.', style: TextStyle(color: colorScheme.onSurfaceVariant)),
+          );
         }
 
-        return ListView.builder(
-          padding: const EdgeInsets.all(16),
-          itemCount: plans.length,
-          itemBuilder: (context, index) {
-            final plan = plans[index];
-
-            return Card(
-              margin: const EdgeInsets.only(bottom: 16),
-              child: Padding(
-                padding: const EdgeInsets.all(18),
+        Widget buildPlanCard(dynamic plan) {
+          return Card(
+            margin: isLandscape ? EdgeInsets.zero : const EdgeInsets.only(bottom: 16),
+            child: Padding(
+              padding: const EdgeInsets.all(18),
+              child: SingleChildScrollView(
+                physics: const ClampingScrollPhysics(),
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
@@ -234,18 +277,28 @@ class _ExerciseEncyclopediaViewState extends State<ExerciseEncyclopediaView> {
                         Expanded(
                           child: Text(
                             plan.title,
-                            style: const TextStyle(fontSize: 17, fontWeight: FontWeight.w700, color: Colors.white),
+                            maxLines: 1,
+                            overflow: TextOverflow.ellipsis,
+                            style: TextStyle(
+                              fontSize: 17,
+                              fontWeight: FontWeight.w700,
+                              color: colorScheme.onSurface,
+                            ),
                           ),
                         ),
                         Container(
                           padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
                           decoration: BoxDecoration(
-                            color: AppColors.emeraldPrimary.withOpacity(0.15),
+                            color: colorScheme.primary.withValues(alpha: 0.15),
                             borderRadius: BorderRadius.circular(8),
                           ),
                           child: Text(
                             '${plan.daysPerWeek} Days/Wk',
-                            style: const TextStyle(fontSize: 11, fontWeight: FontWeight.w700, color: AppColors.emeraldPrimary),
+                            style: TextStyle(
+                              fontSize: 11,
+                              fontWeight: FontWeight.w700,
+                              color: colorScheme.primary,
+                            ),
                           ),
                         ),
                       ],
@@ -253,22 +306,31 @@ class _ExerciseEncyclopediaViewState extends State<ExerciseEncyclopediaView> {
                     const SizedBox(height: 8),
                     Text(
                       plan.description,
-                      style: const TextStyle(fontSize: 13, color: AppColors.darkTextSecondary, height: 1.4),
+                      maxLines: 3,
+                      overflow: TextOverflow.ellipsis,
+                      style: TextStyle(fontSize: 13, color: colorScheme.onSurfaceVariant, height: 1.4),
                     ),
                     const SizedBox(height: 14),
-                    const Divider(color: AppColors.darkBorder),
+                    Divider(color: colorScheme.outlineVariant),
                     const SizedBox(height: 10),
                     Column(
-                      children: plan.schedule.map((dayMap) {
+                      children: (plan.schedule as List).map<Widget>((dayMap) {
                         return Padding(
                           padding: const EdgeInsets.symmetric(vertical: 4),
                           child: Row(
                             mainAxisAlignment: MainAxisAlignment.spaceBetween,
                             children: [
-                              Text(dayMap['day'] as String, style: const TextStyle(fontWeight: FontWeight.w600, fontSize: 13, color: Colors.white)),
+                              Text(
+                                dayMap['day'] as String,
+                                style: TextStyle(
+                                  fontWeight: FontWeight.w600,
+                                  fontSize: 13,
+                                  color: colorScheme.onSurface,
+                                ),
+                              ),
                               Text(
                                 '${dayMap['focus']} (${dayMap['exerciseCount']} exercises)',
-                                style: const TextStyle(fontSize: 12, color: AppColors.cyanAccent),
+                                style: TextStyle(fontSize: 12, color: colorScheme.secondary),
                               ),
                             ],
                           ),
@@ -278,8 +340,28 @@ class _ExerciseEncyclopediaViewState extends State<ExerciseEncyclopediaView> {
                   ],
                 ),
               ),
-            );
-          },
+            ),
+          );
+        }
+
+        if (isLandscape) {
+          return GridView.builder(
+            padding: const EdgeInsets.all(16),
+            gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+              crossAxisCount: 2,
+              childAspectRatio: 1.5,
+              crossAxisSpacing: 14,
+              mainAxisSpacing: 14,
+            ),
+            itemCount: plans.length,
+            itemBuilder: (context, index) => buildPlanCard(plans[index]),
+          );
+        }
+
+        return ListView.builder(
+          padding: const EdgeInsets.all(16),
+          itemCount: plans.length,
+          itemBuilder: (context, index) => buildPlanCard(plans[index]),
         );
       },
     );

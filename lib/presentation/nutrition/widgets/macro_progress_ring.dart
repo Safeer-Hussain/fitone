@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import '../../../core/constants/app_colors.dart';
 import '../../../domain/entities/nutrition_day.dart';
 
 class MacroProgressRing extends StatelessWidget {
@@ -9,9 +8,16 @@ class MacroProgressRing extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final colorScheme = theme.colorScheme;
     final caloriesRemaining = (summary.targetCalories - summary.consumedCalories).clamp(0.0, 9999.0);
 
     return Card(
+      color: colorScheme.surface,
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(16),
+        side: BorderSide(color: colorScheme.outlineVariant),
+      ),
       child: Padding(
         padding: const EdgeInsets.all(20),
         child: Column(
@@ -19,21 +25,21 @@ class MacroProgressRing extends StatelessWidget {
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                const Text(
+                Text(
                   'DAILY ENERGY & MACROS',
                   style: TextStyle(
                     fontSize: 12,
                     fontWeight: FontWeight.w700,
                     letterSpacing: 0.8,
-                    color: AppColors.darkTextSecondary,
+                    color: colorScheme.onSurfaceVariant,
                   ),
                 ),
                 Text(
                   '${caloriesRemaining.toStringAsFixed(0)} kcal left',
-                  style: const TextStyle(
+                  style: TextStyle(
                     fontSize: 12,
                     fontWeight: FontWeight.w700,
-                    color: AppColors.emeraldPrimary,
+                    color: colorScheme.primary,
                   ),
                 ),
               ],
@@ -50,26 +56,26 @@ class MacroProgressRing extends StatelessWidget {
                       CircularProgressIndicator(
                         value: summary.calorieProgress,
                         strokeWidth: 10,
-                        backgroundColor: AppColors.darkSurfaceElevated,
-                        valueColor: const AlwaysStoppedAnimation(AppColors.emeraldPrimary),
+                        backgroundColor: colorScheme.surfaceContainerHighest,
+                        valueColor: AlwaysStoppedAnimation(colorScheme.primary),
                       ),
                       Column(
                         mainAxisSize: MainAxisSize.min,
                         children: [
                           Text(
                             summary.consumedCalories.toStringAsFixed(0),
-                            style: const TextStyle(
+                            style: TextStyle(
                               fontSize: 22,
                               fontWeight: FontWeight.w800,
-                              color: Colors.white,
+                              color: colorScheme.onSurface,
                             ),
                           ),
-                          const Text(
+                          Text(
                             'KCAL',
                             style: TextStyle(
                               fontSize: 9,
                               fontWeight: FontWeight.w700,
-                              color: AppColors.darkTextMuted,
+                              color: colorScheme.onSurfaceVariant,
                             ),
                           ),
                         ],
@@ -85,21 +91,21 @@ class MacroProgressRing extends StatelessWidget {
                         label: 'Protein',
                         consumed: summary.consumedProteinG,
                         target: summary.targetProteinG,
-                        color: AppColors.cyanAccent,
+                        color: colorScheme.secondary,
                       ),
                       const SizedBox(height: 10),
                       _MacroBar(
                         label: 'Carbs',
                         consumed: summary.consumedCarbsG,
                         target: summary.targetCarbsG,
-                        color: AppColors.orangeAccent,
+                        color: colorScheme.tertiary,
                       ),
                       const SizedBox(height: 10),
                       _MacroBar(
                         label: 'Fats',
                         consumed: summary.consumedFatG,
                         target: summary.targetFatG,
-                        color: AppColors.purpleAccent,
+                        color: Colors.purpleAccent,
                       ),
                     ],
                   ),
@@ -128,6 +134,8 @@ class _MacroBar extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final colorScheme = theme.colorScheme;
     final progress = target > 0 ? (consumed / target).clamp(0.0, 1.0) : 0.0;
 
     return Column(
@@ -136,10 +144,13 @@ class _MacroBar extends StatelessWidget {
         Row(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
-            Text(label, style: const TextStyle(fontSize: 12, fontWeight: FontWeight.w600, color: Colors.white)),
+            Text(
+              label,
+              style: TextStyle(fontSize: 12, fontWeight: FontWeight.w600, color: colorScheme.onSurface),
+            ),
             Text(
               '${consumed.toStringAsFixed(0)} / ${target.toStringAsFixed(0)}g',
-              style: const TextStyle(fontSize: 11, color: AppColors.darkTextSecondary),
+              style: TextStyle(fontSize: 11, color: colorScheme.onSurfaceVariant),
             ),
           ],
         ),
@@ -149,7 +160,7 @@ class _MacroBar extends StatelessWidget {
           child: LinearProgressIndicator(
             value: progress,
             minHeight: 6,
-            backgroundColor: AppColors.darkSurfaceElevated,
+            backgroundColor: colorScheme.surfaceContainerHighest,
             valueColor: AlwaysStoppedAnimation(color),
           ),
         ),

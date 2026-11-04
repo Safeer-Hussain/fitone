@@ -1,6 +1,5 @@
 import 'dart:math';
 import 'package:flutter/material.dart';
-import '../../../core/constants/app_colors.dart';
 import '../../../core/constants/app_typography.dart';
 
 class ReadinessRing extends StatelessWidget {
@@ -17,13 +16,16 @@ class ReadinessRing extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final colorScheme = theme.colorScheme;
+
     final statusText = score >= 85
         ? 'Optimal Readiness'
         : (score >= 70 ? 'Moderate Recovery' : 'Rest Advised');
 
     final statusColor = score >= 85
-        ? AppColors.emeraldPrimary
-        : (score >= 70 ? AppColors.cyanAccent : AppColors.orangeAccent);
+        ? colorScheme.primary
+        : (score >= 70 ? colorScheme.secondary : const Color(0xFFFF9100));
 
     return Card(
       child: Padding(
@@ -33,21 +35,21 @@ class ReadinessRing extends StatelessWidget {
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                const Text(
+                Text(
                   'RECOVERY & READINESS',
                   style: TextStyle(
                     fontSize: 12,
                     fontWeight: FontWeight.w700,
                     letterSpacing: 0.8,
-                    color: AppColors.darkTextSecondary,
+                    color: colorScheme.onSurfaceVariant,
                   ),
                 ),
                 Container(
                   padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
                   decoration: BoxDecoration(
-                    color: statusColor.withOpacity(0.15),
+                    color: statusColor.withValues(alpha: 0.15),
                     borderRadius: BorderRadius.circular(12),
-                    border: Border.all(color: statusColor.withOpacity(0.4)),
+                    border: Border.all(color: statusColor.withValues(alpha: 0.4)),
                   ),
                   child: Text(
                     statusText,
@@ -60,14 +62,15 @@ class ReadinessRing extends StatelessWidget {
                 ),
               ],
             ),
-            const SizedBox(height: 24),
+            const SizedBox(height: 20),
             SizedBox(
-              width: 170,
-              height: 170,
+              width: 160,
+              height: 160,
               child: CustomPaint(
                 painter: _ReadinessGaugePainter(
                   score: score,
                   primaryColor: statusColor,
+                  trackColor: colorScheme.outlineVariant.withValues(alpha: 0.5),
                 ),
                 child: Center(
                   child: Column(
@@ -75,15 +78,15 @@ class ReadinessRing extends StatelessWidget {
                     children: [
                       Text(
                         '$score',
-                        style: AppTypography.metricLarge.copyWith(color: Colors.white),
+                        style: AppTypography.metricLarge.copyWith(color: colorScheme.onSurface),
                       ),
-                      const Text(
+                      Text(
                         'SCORE',
                         style: TextStyle(
                           fontSize: 11,
                           fontWeight: FontWeight.w700,
                           letterSpacing: 1.0,
-                          color: AppColors.darkTextMuted,
+                          color: colorScheme.onSurfaceVariant,
                         ),
                       ),
                     ],
@@ -91,7 +94,7 @@ class ReadinessRing extends StatelessWidget {
                 ),
               ),
             ),
-            const SizedBox(height: 24),
+            const SizedBox(height: 20),
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceEvenly,
               children: [
@@ -100,13 +103,15 @@ class ReadinessRing extends StatelessWidget {
                   value: '$hrvMs',
                   sub: '+4ms vs 30d',
                   icon: Icons.graphic_eq_rounded,
+                  accentColor: statusColor,
                 ),
-                Container(width: 1, height: 36, color: AppColors.darkBorder),
+                Container(width: 1, height: 36, color: colorScheme.outlineVariant),
                 _BiometricMetric(
                   label: 'Resting HR',
                   value: '$restingHr',
                   sub: 'BPM baseline',
                   icon: Icons.favorite_rounded,
+                  accentColor: colorScheme.error,
                 ),
               ],
             ),
@@ -122,37 +127,45 @@ class _BiometricMetric extends StatelessWidget {
   final String value;
   final String sub;
   final IconData icon;
+  final Color accentColor;
 
   const _BiometricMetric({
     required this.label,
     required this.value,
     required this.sub,
     required this.icon,
+    required this.accentColor,
   });
 
   @override
   Widget build(BuildContext context) {
+    final colorScheme = Theme.of(context).colorScheme;
+
     return Column(
       children: [
         Row(
           mainAxisSize: MainAxisSize.min,
           children: [
-            Icon(icon, size: 14, color: AppColors.emeraldPrimary),
+            Icon(icon, size: 14, color: accentColor),
             const SizedBox(width: 4),
             Text(
               label,
-              style: const TextStyle(fontSize: 12, color: AppColors.darkTextSecondary),
+              style: TextStyle(fontSize: 12, color: colorScheme.onSurfaceVariant),
+              maxLines: 1,
+              overflow: TextOverflow.ellipsis,
             ),
           ],
         ),
         const SizedBox(height: 4),
         Text(
           value,
-          style: AppTypography.metricMedium.copyWith(color: Colors.white),
+          style: AppTypography.metricMedium.copyWith(color: colorScheme.onSurface),
         ),
         Text(
           sub,
-          style: const TextStyle(fontSize: 11, color: AppColors.darkTextMuted),
+          style: TextStyle(fontSize: 11, color: colorScheme.onSurfaceVariant.withValues(alpha: 0.7)),
+          maxLines: 1,
+          overflow: TextOverflow.ellipsis,
         ),
       ],
     );
@@ -162,8 +175,13 @@ class _BiometricMetric extends StatelessWidget {
 class _ReadinessGaugePainter extends CustomPainter {
   final int score;
   final Color primaryColor;
+  final Color trackColor;
 
-  _ReadinessGaugePainter({required this.score, required this.primaryColor});
+  _ReadinessGaugePainter({
+    required this.score,
+    required this.primaryColor,
+    required this.trackColor,
+  });
 
   @override
   void paint(Canvas canvas, Size size) {
@@ -174,7 +192,7 @@ class _ReadinessGaugePainter extends CustomPainter {
     const sweepAngle = 1.5 * pi;
 
     final backgroundPaint = Paint()
-      ..color = AppColors.darkBorder.withOpacity(0.5)
+      ..color = trackColor
       ..style = PaintingStyle.stroke
       ..strokeWidth = 14
       ..strokeCap = StrokeCap.round;
@@ -192,7 +210,7 @@ class _ReadinessGaugePainter extends CustomPainter {
       ..shader = SweepGradient(
         startAngle: startAngle,
         endAngle: startAngle + sweepAngle,
-        colors: [primaryColor.withOpacity(0.4), primaryColor],
+        colors: [primaryColor.withValues(alpha: 0.4), primaryColor],
       ).createShader(Rect.fromCircle(center: center, radius: radius))
       ..style = PaintingStyle.stroke
       ..strokeWidth = 14
@@ -209,5 +227,7 @@ class _ReadinessGaugePainter extends CustomPainter {
 
   @override
   bool shouldRepaint(_ReadinessGaugePainter oldDelegate) =>
-      oldDelegate.score != score || oldDelegate.primaryColor != primaryColor;
+      oldDelegate.score != score ||
+      oldDelegate.primaryColor != primaryColor ||
+      oldDelegate.trackColor != trackColor;
 }

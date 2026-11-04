@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_mobx/flutter_mobx.dart';
-import '../constants/app_colors.dart';
 import '../database/app_database.dart';
 import '../network/network_monitor.dart';
 
@@ -10,47 +9,53 @@ class DeveloperDebugDrawer extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final monitor = NetworkMonitor.instance;
+    final theme = Theme.of(context);
+    final colorScheme = theme.colorScheme;
 
     return Drawer(
-      backgroundColor: AppColors.darkBackground,
+      backgroundColor: theme.scaffoldBackgroundColor,
       child: SafeArea(
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Container(
               padding: const EdgeInsets.all(20),
-              decoration: const BoxDecoration(
-                border: Border(bottom: BorderSide(color: AppColors.darkBorder)),
+              decoration: BoxDecoration(
+                border: Border(bottom: BorderSide(color: colorScheme.outlineVariant)),
               ),
               child: Row(
                 children: [
                   Container(
                     padding: const EdgeInsets.all(8),
                     decoration: BoxDecoration(
-                      color: AppColors.emeraldPrimary.withOpacity(0.15),
+                      color: colorScheme.primary.withValues(alpha: 0.15),
                       borderRadius: BorderRadius.circular(8),
                     ),
-                    child: const Icon(Icons.terminal_rounded, color: AppColors.emeraldPrimary, size: 20),
+                    child: Icon(Icons.terminal_rounded, color: colorScheme.primary, size: 20),
                   ),
                   const SizedBox(width: 12),
-                  const Expanded(
+                  Expanded(
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         Text(
                           'Developer & Recruiter Hub',
                           style: TextStyle(
-                            color: Colors.white,
+                            color: colorScheme.onSurface,
                             fontSize: 15,
                             fontWeight: FontWeight.w700,
                           ),
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
                         ),
                         Text(
                           'Telemetry, Latency & Error Injection',
                           style: TextStyle(
-                            color: AppColors.darkTextSecondary,
+                            color: colorScheme.onSurfaceVariant,
                             fontSize: 11,
                           ),
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
                         ),
                       ],
                     ),
@@ -62,10 +67,10 @@ class DeveloperDebugDrawer extends StatelessWidget {
               child: ListView(
                 padding: const EdgeInsets.all(16),
                 children: [
-                  const Text(
+                  Text(
                     'NETWORK SIMULATION',
                     style: TextStyle(
-                      color: AppColors.emeraldPrimary,
+                      color: colorScheme.primary,
                       fontSize: 11,
                       fontWeight: FontWeight.w800,
                       letterSpacing: 1.0,
@@ -75,25 +80,37 @@ class DeveloperDebugDrawer extends StatelessWidget {
                   Observer(
                     builder: (_) => SwitchListTile.adaptive(
                       contentPadding: EdgeInsets.zero,
-                      title: const Text('Force API Error (503)', style: TextStyle(fontSize: 14)),
-                      subtitle: const Text('Tests Dio interceptor error handling & retry UI', style: TextStyle(fontSize: 12, color: AppColors.darkTextSecondary)),
+                      title: Text(
+                        'Force API Error (503)',
+                        style: TextStyle(fontSize: 14, color: colorScheme.onSurface),
+                      ),
+                      subtitle: Text(
+                        'Tests Dio interceptor error handling & retry UI',
+                        style: TextStyle(fontSize: 12, color: colorScheme.onSurfaceVariant),
+                      ),
                       value: monitor.forceApiError,
-                      activeColor: AppColors.redAccent,
+                      activeThumbColor: colorScheme.error,
                       onChanged: (val) => monitor.setForceApiError(val),
                     ),
                   ),
-                  const Divider(color: AppColors.darkBorder),
+                  Divider(color: colorScheme.outlineVariant),
                   Observer(
                     builder: (_) => SwitchListTile.adaptive(
                       contentPadding: EdgeInsets.zero,
-                      title: const Text('Simulate Offline Mode', style: TextStyle(fontSize: 14)),
-                      subtitle: const Text('Forces local SQLite database cache usage', style: TextStyle(fontSize: 12, color: AppColors.darkTextSecondary)),
+                      title: Text(
+                        'Simulate Offline Mode',
+                        style: TextStyle(fontSize: 14, color: colorScheme.onSurface),
+                      ),
+                      subtitle: Text(
+                        'Forces local SQLite database cache usage',
+                        style: TextStyle(fontSize: 12, color: colorScheme.onSurfaceVariant),
+                      ),
                       value: !monitor.isOnline,
-                      activeColor: AppColors.orangeAccent,
+                      activeThumbColor: const Color(0xFFF59E0B),
                       onChanged: (val) => monitor.setManualOnlineState(!val),
                     ),
                   ),
-                  const Divider(color: AppColors.darkBorder),
+                  Divider(color: colorScheme.outlineVariant),
                   const SizedBox(height: 12),
                   Observer(
                     builder: (_) => Column(
@@ -102,8 +119,18 @@ class DeveloperDebugDrawer extends StatelessWidget {
                         Row(
                           mainAxisAlignment: MainAxisAlignment.spaceBetween,
                           children: [
-                            const Text('Simulated Network Latency', style: TextStyle(fontSize: 14)),
-                            Text('${monitor.simulatedLatencyMs} ms', style: const TextStyle(fontSize: 13, fontWeight: FontWeight.w700, color: AppColors.emeraldPrimary)),
+                            Text(
+                              'Simulated Network Latency',
+                              style: TextStyle(fontSize: 14, color: colorScheme.onSurface),
+                            ),
+                            Text(
+                              '${monitor.simulatedLatencyMs} ms',
+                              style: TextStyle(
+                                fontSize: 13,
+                                fontWeight: FontWeight.w700,
+                                color: colorScheme.primary,
+                              ),
+                            ),
                           ],
                         ),
                         Slider(
@@ -111,18 +138,18 @@ class DeveloperDebugDrawer extends StatelessWidget {
                           min: 0,
                           max: 2000,
                           divisions: 20,
-                          activeColor: AppColors.emeraldPrimary,
-                          inactiveColor: AppColors.darkSurfaceElevated,
+                          activeColor: colorScheme.primary,
+                          inactiveColor: colorScheme.surfaceContainer,
                           onChanged: (val) => monitor.setSimulatedLatency(val.toInt()),
                         ),
                       ],
                     ),
                   ),
                   const SizedBox(height: 16),
-                  const Text(
+                  Text(
                     'WEARABLE TELEMETRY RATE',
                     style: TextStyle(
-                      color: AppColors.emeraldPrimary,
+                      color: colorScheme.primary,
                       fontSize: 11,
                       fontWeight: FontWeight.w800,
                       letterSpacing: 1.0,
@@ -153,10 +180,10 @@ class DeveloperDebugDrawer extends StatelessWidget {
                     ),
                   ),
                   const SizedBox(height: 24),
-                  const Text(
+                  Text(
                     'DATABASE OPERATIONS',
                     style: TextStyle(
-                      color: AppColors.emeraldPrimary,
+                      color: colorScheme.primary,
                       fontSize: 11,
                       fontWeight: FontWeight.w800,
                       letterSpacing: 1.0,
@@ -171,9 +198,9 @@ class DeveloperDebugDrawer extends StatelessWidget {
                       await db.delete('running_routes');
                       if (context.mounted) {
                         ScaffoldMessenger.of(context).showSnackBar(
-                          const SnackBar(
-                            content: Text('Transient logs cleared. Seed tables retained.'),
-                            backgroundColor: AppColors.darkSurfaceElevated,
+                          SnackBar(
+                            content: const Text('Transient logs cleared. Seed tables retained.'),
+                            backgroundColor: colorScheme.surfaceContainerHighest,
                           ),
                         );
                       }
@@ -181,8 +208,8 @@ class DeveloperDebugDrawer extends StatelessWidget {
                     icon: const Icon(Icons.cleaning_services_rounded, size: 16),
                     label: const Text('Reset Temporary Run & Workout Logs'),
                     style: OutlinedButton.styleFrom(
-                      foregroundColor: AppColors.darkTextPrimary,
-                      side: const BorderSide(color: AppColors.darkBorder),
+                      foregroundColor: colorScheme.onSurface,
+                      side: BorderSide(color: colorScheme.outlineVariant),
                     ),
                   ),
                 ],
@@ -208,6 +235,8 @@ class _TelemetryChip extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final colorScheme = Theme.of(context).colorScheme;
+
     return Expanded(
       child: GestureDetector(
         onTap: onTap,
@@ -215,10 +244,10 @@ class _TelemetryChip extends StatelessWidget {
           padding: const EdgeInsets.symmetric(vertical: 10),
           alignment: Alignment.center,
           decoration: BoxDecoration(
-            color: isSelected ? AppColors.emeraldPrimary : AppColors.darkSurfaceElevated,
+            color: isSelected ? colorScheme.primary : colorScheme.surfaceContainer,
             borderRadius: BorderRadius.circular(10),
             border: Border.all(
-              color: isSelected ? AppColors.emeraldPrimary : AppColors.darkBorder,
+              color: isSelected ? colorScheme.primary : colorScheme.outlineVariant,
             ),
           ),
           child: Text(
@@ -226,8 +255,10 @@ class _TelemetryChip extends StatelessWidget {
             style: TextStyle(
               fontSize: 11,
               fontWeight: FontWeight.w700,
-              color: isSelected ? Colors.black : AppColors.darkTextPrimary,
+              color: isSelected ? colorScheme.onPrimary : colorScheme.onSurface,
             ),
+            maxLines: 1,
+            overflow: TextOverflow.ellipsis,
           ),
         ),
       ),

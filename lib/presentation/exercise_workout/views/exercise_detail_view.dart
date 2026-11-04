@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import '../../../core/constants/app_assets.dart';
-import '../../../core/constants/app_colors.dart';
 import '../../../domain/entities/exercise.dart';
 import '../widgets/one_rm_calculator_sheet.dart';
 
@@ -20,106 +19,158 @@ class ExerciseDetailView extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final colorScheme = theme.colorScheme;
+    final isLandscape = MediaQuery.of(context).orientation == Orientation.landscape;
+
+    Widget imageSection = ClipRRect(
+      borderRadius: BorderRadius.circular(16),
+      child: Container(
+        height: isLandscape ? 220 : 180,
+        color: colorScheme.surfaceContainerHighest,
+        child: Image.asset(
+          _getEquipmentImage(exercise.equipment),
+          fit: BoxFit.cover,
+          errorBuilder: (_, __, ___) => Container(
+            color: colorScheme.surfaceContainerHighest,
+            child: Center(
+              child: Icon(Icons.fitness_center_rounded, size: 54, color: colorScheme.primary),
+            ),
+          ),
+        ),
+      ),
+    );
+
+    Widget chipsSection = Row(
+      children: [
+        _DetailChip(label: exercise.bodyPart, color: colorScheme.secondary),
+        const SizedBox(width: 8),
+        _DetailChip(label: exercise.equipment, color: colorScheme.primary),
+        const SizedBox(width: 8),
+        _DetailChip(label: exercise.difficulty, color: colorScheme.tertiary),
+      ],
+    );
+
+    Widget contentSection = Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text(
+          'ANATOMICAL TARGET MUSCLES',
+          style: TextStyle(
+            fontSize: 12,
+            fontWeight: FontWeight.w800,
+            letterSpacing: 1.0,
+            color: colorScheme.primary,
+          ),
+        ),
+        const SizedBox(height: 8),
+        Container(
+          width: double.infinity,
+          padding: const EdgeInsets.all(14),
+          decoration: BoxDecoration(
+            color: colorScheme.surface,
+            borderRadius: BorderRadius.circular(12),
+            border: Border.all(color: colorScheme.outlineVariant),
+          ),
+          child: Text(
+            exercise.targetMuscles,
+            style: TextStyle(fontSize: 14, color: colorScheme.onSurface, height: 1.4),
+          ),
+        ),
+        const SizedBox(height: 24),
+        Text(
+          'BIOMECHANICAL INSTRUCTIONS',
+          style: TextStyle(
+            fontSize: 12,
+            fontWeight: FontWeight.w800,
+            letterSpacing: 1.0,
+            color: colorScheme.primary,
+          ),
+        ),
+        const SizedBox(height: 8),
+        Container(
+          width: double.infinity,
+          padding: const EdgeInsets.all(16),
+          decoration: BoxDecoration(
+            color: colorScheme.surface,
+            borderRadius: BorderRadius.circular(12),
+            border: Border.all(color: colorScheme.outlineVariant),
+          ),
+          child: Text(
+            exercise.instructions,
+            style: TextStyle(fontSize: 14, color: colorScheme.onSurfaceVariant, height: 1.5),
+          ),
+        ),
+        const SizedBox(height: 28),
+        SizedBox(
+          width: double.infinity,
+          child: ElevatedButton.icon(
+            onPressed: () => OneRmCalculatorSheet.show(context),
+            icon: const Icon(Icons.calculate_rounded, size: 18),
+            label: const Text('Calculate 1RM & Overload Targets'),
+            style: ElevatedButton.styleFrom(
+              backgroundColor: colorScheme.primary,
+              foregroundColor: colorScheme.onPrimary,
+              padding: const EdgeInsets.symmetric(vertical: 14),
+              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+            ),
+          ),
+        ),
+      ],
+    );
+
     return Scaffold(
       appBar: AppBar(
         title: Text(exercise.name),
         actions: [
           IconButton(
             onPressed: () => OneRmCalculatorSheet.show(context),
-            icon: const Icon(Icons.calculate_outlined, color: AppColors.emeraldPrimary),
+            icon: Icon(Icons.calculate_outlined, color: colorScheme.primary),
             tooltip: '1RM Calculator',
           ),
         ],
       ),
-      body: ListView(
-        padding: const EdgeInsets.all(20),
-        children: [
-          ClipRRect(
-            borderRadius: BorderRadius.circular(16),
-            child: Container(
-              height: 180,
-              color: AppColors.darkSurface,
-              child: Image.asset(
-                _getEquipmentImage(exercise.equipment),
-                fit: BoxFit.cover,
-                errorBuilder: (_, __, ___) => Container(
-                  color: AppColors.darkSurface,
-                  child: const Center(
-                    child: Icon(Icons.fitness_center_rounded, size: 54, color: AppColors.emeraldPrimary),
-                  ),
+      body: SafeArea(
+        child: isLandscape
+            ? Padding(
+                padding: const EdgeInsets.all(20),
+                child: Row(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Expanded(
+                      flex: 4,
+                      child: SingleChildScrollView(
+                        physics: const ClampingScrollPhysics(),
+                        child: Column(
+                          children: [
+                            imageSection,
+                            const SizedBox(height: 16),
+                            chipsSection,
+                          ],
+                        ),
+                      ),
+                    ),
+                    const SizedBox(width: 20),
+                    Expanded(
+                      flex: 6,
+                      child: SingleChildScrollView(
+                        physics: const ClampingScrollPhysics(),
+                        child: contentSection,
+                      ),
+                    ),
+                  ],
                 ),
+              )
+            : ListView(
+                padding: const EdgeInsets.all(20),
+                children: [
+                  imageSection,
+                  const SizedBox(height: 20),
+                  chipsSection,
+                  const SizedBox(height: 24),
+                  contentSection,
+                ],
               ),
-            ),
-          ),
-          const SizedBox(height: 20),
-          Row(
-            children: [
-              _DetailChip(label: exercise.bodyPart, color: AppColors.cyanAccent),
-              const SizedBox(width: 8),
-              _DetailChip(label: exercise.equipment, color: AppColors.emeraldPrimary),
-              const SizedBox(width: 8),
-              _DetailChip(label: exercise.difficulty, color: AppColors.orangeAccent),
-            ],
-          ),
-          const SizedBox(height: 24),
-          const Text(
-            'ANATOMICAL TARGET MUSCLES',
-            style: TextStyle(
-              fontSize: 12,
-              fontWeight: FontWeight.w800,
-              letterSpacing: 1.0,
-              color: AppColors.emeraldPrimary,
-            ),
-          ),
-          const SizedBox(height: 8),
-          Container(
-            padding: const EdgeInsets.all(14),
-            decoration: BoxDecoration(
-              color: AppColors.darkSurface,
-              borderRadius: BorderRadius.circular(12),
-              border: Border.all(color: AppColors.darkBorder),
-            ),
-            child: Text(
-              exercise.targetMuscles,
-              style: const TextStyle(fontSize: 14, color: Colors.white, height: 1.4),
-            ),
-          ),
-          const SizedBox(height: 24),
-          const Text(
-            'BIOMECHANICAL INSTRUCTIONS',
-            style: TextStyle(
-              fontSize: 12,
-              fontWeight: FontWeight.w800,
-              letterSpacing: 1.0,
-              color: AppColors.emeraldPrimary,
-            ),
-          ),
-          const SizedBox(height: 8),
-          Container(
-            padding: const EdgeInsets.all(16),
-            decoration: BoxDecoration(
-              color: AppColors.darkSurface,
-              borderRadius: BorderRadius.circular(12),
-              border: Border.all(color: AppColors.darkBorder),
-            ),
-            child: Text(
-              exercise.instructions,
-              style: const TextStyle(fontSize: 14, color: AppColors.darkTextSecondary, height: 1.5),
-            ),
-          ),
-          const SizedBox(height: 28),
-          ElevatedButton.icon(
-            onPressed: () => OneRmCalculatorSheet.show(context),
-            icon: const Icon(Icons.calculate_rounded, size: 18),
-            label: const Text('Calculate 1RM & Overload Targets'),
-            style: ElevatedButton.styleFrom(
-              backgroundColor: AppColors.emeraldPrimary,
-              foregroundColor: Colors.black,
-              padding: const EdgeInsets.symmetric(vertical: 14),
-              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-            ),
-          ),
-        ],
       ),
     );
   }
@@ -136,9 +187,9 @@ class _DetailChip extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
       decoration: BoxDecoration(
-        color: color.withOpacity(0.15),
+        color: color.withValues(alpha: 0.15),
         borderRadius: BorderRadius.circular(8),
-        border: Border.all(color: color.withOpacity(0.3)),
+        border: Border.all(color: color.withValues(alpha: 0.3)),
       ),
       child: Text(
         label,

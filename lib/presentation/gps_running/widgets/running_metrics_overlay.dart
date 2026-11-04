@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import '../../../core/constants/app_colors.dart';
 import '../stores/gps_running_store.dart';
 
 class RunningMetricsOverlay extends StatelessWidget {
@@ -9,12 +8,22 @@ class RunningMetricsOverlay extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final colorScheme = theme.colorScheme;
+
     return Container(
       padding: const EdgeInsets.all(18),
       decoration: BoxDecoration(
-        color: AppColors.darkBackground.withOpacity(0.92),
+        color: colorScheme.surface.withValues(alpha: 0.94),
         borderRadius: BorderRadius.circular(20),
-        border: Border.all(color: AppColors.darkBorder),
+        border: Border.all(color: colorScheme.outlineVariant),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withValues(alpha: 0.2),
+            blurRadius: 10,
+            offset: const Offset(0, 4),
+          ),
+        ],
       ),
       child: Column(
         mainAxisSize: MainAxisSize.min,
@@ -25,16 +34,20 @@ class RunningMetricsOverlay extends StatelessWidget {
               Container(
                 padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
                 decoration: BoxDecoration(
-                  color: AppColors.emeraldPrimary.withOpacity(0.18),
+                  color: colorScheme.primary.withValues(alpha: 0.18),
                   borderRadius: BorderRadius.circular(8),
                 ),
                 child: Row(
                   children: [
-                    Container(width: 6, height: 6, decoration: const BoxDecoration(color: AppColors.emeraldPrimary, shape: BoxShape.circle)),
+                    Container(
+                      width: 6,
+                      height: 6,
+                      decoration: BoxDecoration(color: colorScheme.primary, shape: BoxShape.circle),
+                    ),
                     const SizedBox(width: 6),
                     Text(
                       store.isSimulating ? 'SIMULATING GPS (LAHORE)' : 'GPS ACTIVE (ACCURACY 3M)',
-                      style: const TextStyle(fontSize: 10, fontWeight: FontWeight.w800, color: AppColors.emeraldPrimary),
+                      style: TextStyle(fontSize: 10, fontWeight: FontWeight.w800, color: colorScheme.primary),
                     ),
                   ],
                 ),
@@ -42,12 +55,12 @@ class RunningMetricsOverlay extends StatelessWidget {
               Container(
                 padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
                 decoration: BoxDecoration(
-                  color: AppColors.redAccent.withOpacity(0.15),
+                  color: colorScheme.error.withValues(alpha: 0.15),
                   borderRadius: BorderRadius.circular(8),
                 ),
                 child: Text(
                   store.hrZone,
-                  style: const TextStyle(fontSize: 10, fontWeight: FontWeight.w700, color: AppColors.redAccent),
+                  style: TextStyle(fontSize: 10, fontWeight: FontWeight.w700, color: colorScheme.error),
                 ),
               ),
             ],
@@ -56,20 +69,38 @@ class RunningMetricsOverlay extends StatelessWidget {
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceAround,
             children: [
-              _MetricItem(label: 'TIME', value: store.formattedDuration),
-              _MetricItem(label: 'DISTANCE', value: '${store.distanceKm.toStringAsFixed(2)} km'),
-              _MetricItem(label: 'PACE', value: store.formattedPace),
+              _MetricItem(label: 'TIME', value: store.formattedDuration, colorScheme: colorScheme),
+              _MetricItem(label: 'DISTANCE', value: '${store.distanceKm.toStringAsFixed(2)} km', colorScheme: colorScheme),
+              _MetricItem(label: 'PACE', value: store.formattedPace, colorScheme: colorScheme),
             ],
           ),
           const SizedBox(height: 14),
-          const Divider(color: AppColors.darkBorder),
+          Divider(color: colorScheme.outlineVariant),
           const SizedBox(height: 12),
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceAround,
             children: [
-              _SubMetric(label: 'Smart-Ring HR', value: '${store.currentHeartRate} BPM', icon: Icons.favorite_rounded, color: AppColors.redAccent),
-              _SubMetric(label: 'Elevation Gain', value: '${store.elevationGainM.toStringAsFixed(1)} m', icon: Icons.terrain_rounded, color: AppColors.cyanAccent),
-              _SubMetric(label: 'Energy Burned', value: '${store.caloriesBurned.toStringAsFixed(0)} kcal', icon: Icons.local_fire_department_rounded, color: AppColors.orangeAccent),
+              _SubMetric(
+                label: 'Smart-Ring HR',
+                value: '${store.currentHeartRate} BPM',
+                icon: Icons.favorite_rounded,
+                color: colorScheme.error,
+                colorScheme: colorScheme,
+              ),
+              _SubMetric(
+                label: 'Elevation Gain',
+                value: '${store.elevationGainM.toStringAsFixed(1)} m',
+                icon: Icons.terrain_rounded,
+                color: colorScheme.secondary,
+                colorScheme: colorScheme,
+              ),
+              _SubMetric(
+                label: 'Energy Burned',
+                value: '${store.caloriesBurned.toStringAsFixed(0)} kcal',
+                icon: Icons.local_fire_department_rounded,
+                color: colorScheme.tertiary,
+                colorScheme: colorScheme,
+              ),
             ],
           ),
         ],
@@ -81,16 +112,30 @@ class RunningMetricsOverlay extends StatelessWidget {
 class _MetricItem extends StatelessWidget {
   final String label;
   final String value;
+  final ColorScheme colorScheme;
 
-  const _MetricItem({required this.label, required this.value});
+  const _MetricItem({required this.label, required this.value, required this.colorScheme});
 
   @override
   Widget build(BuildContext context) {
     return Column(
       children: [
-        Text(label, style: const TextStyle(fontSize: 10, color: AppColors.darkTextMuted, fontWeight: FontWeight.w700, letterSpacing: 0.8)),
+        Text(
+          label,
+          style: TextStyle(
+            fontSize: 10,
+            color: colorScheme.onSurfaceVariant,
+            fontWeight: FontWeight.w700,
+            letterSpacing: 0.8,
+          ),
+        ),
         const SizedBox(height: 2),
-        Text(value, style: const TextStyle(fontSize: 20, fontWeight: FontWeight.w800, color: Colors.white)),
+        Text(
+          value,
+          maxLines: 1,
+          overflow: TextOverflow.ellipsis,
+          style: TextStyle(fontSize: 20, fontWeight: FontWeight.w800, color: colorScheme.onSurface),
+        ),
       ],
     );
   }
@@ -101,8 +146,15 @@ class _SubMetric extends StatelessWidget {
   final String value;
   final IconData icon;
   final Color color;
+  final ColorScheme colorScheme;
 
-  const _SubMetric({required this.label, required this.value, required this.icon, required this.color});
+  const _SubMetric({
+    required this.label,
+    required this.value,
+    required this.icon,
+    required this.color,
+    required this.colorScheme,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -113,8 +165,13 @@ class _SubMetric extends StatelessWidget {
         Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Text(label, style: const TextStyle(fontSize: 10, color: AppColors.darkTextMuted)),
-            Text(value, style: const TextStyle(fontSize: 11, fontWeight: FontWeight.w700, color: Colors.white)),
+            Text(label, style: TextStyle(fontSize: 10, color: colorScheme.onSurfaceVariant)),
+            Text(
+              value,
+              maxLines: 1,
+              overflow: TextOverflow.ellipsis,
+              style: TextStyle(fontSize: 11, fontWeight: FontWeight.w700, color: colorScheme.onSurface),
+            ),
           ],
         ),
       ],

@@ -16,7 +16,13 @@ class AppTheme {
         secondary: AppColors.cyanAccent,
         onSecondary: Colors.black,
         surface: AppColors.darkSurface,
+        surfaceContainer: AppColors.darkSurfaceElevated,
+        surfaceContainerHighest: AppColors.darkSurfaceHighlight,
+        surfaceContainerLow: AppColors.darkBackground,
+        outlineVariant: AppColors.darkBorder,
+        outline: AppColors.darkBorder,
         onSurface: AppColors.darkTextPrimary,
+        onSurfaceVariant: AppColors.darkTextSecondary,
         error: AppColors.redAccent,
         onError: Colors.white,
       ),
@@ -46,6 +52,21 @@ class AppTheme {
           side: const BorderSide(color: AppColors.darkBorder, width: 1),
         ),
         margin: EdgeInsets.zero,
+      ),
+      bottomSheetTheme: const BottomSheetThemeData(
+        backgroundColor: AppColors.darkSurface,
+        surfaceTintColor: Colors.transparent,
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
+          side: BorderSide(color: AppColors.darkBorder),
+        ),
+      ),
+      dialogTheme: DialogThemeData(
+        backgroundColor: AppColors.darkSurface,
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(20),
+          side: const BorderSide(color: AppColors.darkBorder),
+        ),
       ),
       inputDecorationTheme: InputDecorationTheme(
         filled: true,
@@ -103,6 +124,22 @@ class AppTheme {
           return const IconThemeData(color: AppColors.darkTextMuted, size: 22);
         }),
       ),
+      navigationRailTheme: NavigationRailThemeData(
+        backgroundColor: AppColors.darkSurface,
+        indicatorColor: AppColors.emeraldPrimary.withValues(alpha: 0.18),
+        selectedIconTheme: const IconThemeData(color: AppColors.emeraldPrimary, size: 24),
+        unselectedIconTheme: const IconThemeData(color: AppColors.darkTextMuted, size: 22),
+        selectedLabelTextStyle: const TextStyle(
+          fontSize: 11,
+          fontWeight: FontWeight.w700,
+          color: AppColors.emeraldPrimary,
+        ),
+        unselectedLabelTextStyle: const TextStyle(
+          fontSize: 11,
+          fontWeight: FontWeight.w500,
+          color: AppColors.darkTextMuted,
+        ),
+      ),
       dividerTheme: const DividerThemeData(
         color: AppColors.darkBorder,
         thickness: 1,
@@ -122,7 +159,13 @@ class AppTheme {
         secondary: AppColors.blueAccent,
         onSecondary: Colors.white,
         surface: AppColors.lightSurface,
+        surfaceContainer: AppColors.lightSurfaceElevated,
+        surfaceContainerHighest: AppColors.lightSurfaceHighlight,
+        surfaceContainerLow: AppColors.lightBackground,
+        outlineVariant: AppColors.lightBorder,
+        outline: AppColors.lightBorder,
         onSurface: AppColors.lightTextPrimary,
+        onSurfaceVariant: AppColors.lightTextSecondary,
         error: AppColors.redAccent,
         onError: Colors.white,
       ),
@@ -153,6 +196,21 @@ class AppTheme {
         ),
         margin: EdgeInsets.zero,
       ),
+      bottomSheetTheme: const BottomSheetThemeData(
+        backgroundColor: AppColors.lightSurface,
+        surfaceTintColor: Colors.transparent,
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
+          side: BorderSide(color: AppColors.lightBorder),
+        ),
+      ),
+      dialogTheme: DialogThemeData(
+        backgroundColor: AppColors.lightSurface,
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(20),
+          side: const BorderSide(color: AppColors.lightBorder),
+        ),
+      ),
       inputDecorationTheme: InputDecorationTheme(
         filled: true,
         fillColor: AppColors.lightSurfaceElevated,
@@ -171,10 +229,23 @@ class AppTheme {
         ),
         hintStyle: const TextStyle(color: AppColors.lightTextMuted, fontSize: 14),
       ),
+      chipTheme: ChipThemeData(
+        backgroundColor: AppColors.lightSurfaceElevated,
+        selectedColor: AppColors.emeraldDark.withValues(alpha: 0.15),
+        disabledColor: AppColors.lightSurface,
+        labelStyle: const TextStyle(fontSize: 12, fontWeight: FontWeight.w600, color: AppColors.lightTextPrimary),
+        secondaryLabelStyle: const TextStyle(fontSize: 12, fontWeight: FontWeight.w700, color: AppColors.emeraldDark),
+        padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(20),
+          side: const BorderSide(color: AppColors.lightBorder),
+        ),
+      ),
       navigationBarTheme: NavigationBarThemeData(
         backgroundColor: AppColors.lightSurface,
         indicatorColor: AppColors.emeraldDark.withValues(alpha: 0.15),
         elevation: 8,
+        labelBehavior: NavigationDestinationLabelBehavior.alwaysShow,
         labelTextStyle: WidgetStateProperty.resolveWith((states) {
           if (states.contains(WidgetState.selected)) {
             return const TextStyle(
@@ -189,6 +260,28 @@ class AppTheme {
             color: AppColors.lightTextMuted,
           );
         }),
+        iconTheme: WidgetStateProperty.resolveWith((states) {
+          if (states.contains(WidgetState.selected)) {
+            return const IconThemeData(color: AppColors.emeraldDark, size: 22);
+          }
+          return const IconThemeData(color: AppColors.lightTextMuted, size: 22);
+        }),
+      ),
+      navigationRailTheme: NavigationRailThemeData(
+        backgroundColor: AppColors.lightSurface,
+        indicatorColor: AppColors.emeraldDark.withValues(alpha: 0.15),
+        selectedIconTheme: const IconThemeData(color: AppColors.emeraldDark, size: 24),
+        unselectedIconTheme: const IconThemeData(color: AppColors.lightTextMuted, size: 22),
+        selectedLabelTextStyle: const TextStyle(
+          fontSize: 11,
+          fontWeight: FontWeight.w700,
+          color: AppColors.emeraldDark,
+        ),
+        unselectedLabelTextStyle: const TextStyle(
+          fontSize: 11,
+          fontWeight: FontWeight.w500,
+          color: AppColors.lightTextMuted,
+        ),
       ),
       dividerTheme: const DividerThemeData(
         color: AppColors.lightBorder,

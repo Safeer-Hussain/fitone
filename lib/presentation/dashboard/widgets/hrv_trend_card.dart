@@ -1,12 +1,15 @@
 import 'package:fl_chart/fl_chart.dart';
 import 'package:flutter/material.dart';
-import '../../../core/constants/app_colors.dart';
 
 class HrvTrendCard extends StatelessWidget {
   const HrvTrendCard({super.key});
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final colorScheme = theme.colorScheme;
+    final cyanAccent = colorScheme.secondary;
+
     final hrvSpots = [
       const FlSpot(0, 58),
       const FlSpot(1, 62),
@@ -25,7 +28,7 @@ class HrvTrendCard extends StatelessWidget {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            const Row(
+            Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
                 Text(
@@ -34,7 +37,7 @@ class HrvTrendCard extends StatelessWidget {
                     fontSize: 12,
                     fontWeight: FontWeight.w700,
                     letterSpacing: 0.8,
-                    color: AppColors.darkTextSecondary,
+                    color: colorScheme.onSurfaceVariant,
                   ),
                 ),
                 Text(
@@ -42,7 +45,7 @@ class HrvTrendCard extends StatelessWidget {
                   style: TextStyle(
                     fontSize: 12,
                     fontWeight: FontWeight.w700,
-                    color: AppColors.cyanAccent,
+                    color: cyanAccent,
                   ),
                 ),
               ],
@@ -58,8 +61,8 @@ class HrvTrendCard extends StatelessWidget {
                     show: true,
                     drawVerticalLine: false,
                     horizontalInterval: 10,
-                    getDrawingHorizontalLine: (value) => const FlLine(
-                      color: AppColors.darkBorder,
+                    getDrawingHorizontalLine: (value) => FlLine(
+                      color: colorScheme.outlineVariant,
                       strokeWidth: 0.8,
                     ),
                   ),
@@ -77,7 +80,7 @@ class HrvTrendCard extends StatelessWidget {
                           if (idx >= 0 && idx < days.length) {
                             return Text(
                               days[idx],
-                              style: const TextStyle(color: AppColors.darkTextMuted, fontSize: 10),
+                              style: TextStyle(color: colorScheme.onSurfaceVariant, fontSize: 10),
                             );
                           }
                           return const SizedBox.shrink();
@@ -91,15 +94,15 @@ class HrvTrendCard extends StatelessWidget {
                       spots: hrvSpots,
                       isCurved: true,
                       curveSmoothness: 0.3,
-                      color: AppColors.cyanAccent,
+                      color: cyanAccent,
                       barWidth: 2.5,
                       dotData: FlDotData(
                         show: true,
                         getDotPainter: (spot, percent, barData, index) => FlDotCirclePainter(
                           radius: 3.5,
-                          color: AppColors.cyanAccent,
+                          color: cyanAccent,
                           strokeWidth: 1.5,
-                          strokeColor: AppColors.darkSurface,
+                          strokeColor: colorScheme.surface,
                         ),
                       ),
                       belowBarData: BarAreaData(
@@ -108,8 +111,8 @@ class HrvTrendCard extends StatelessWidget {
                           begin: Alignment.topCenter,
                           end: Alignment.bottomCenter,
                           colors: [
-                            AppColors.cyanAccent.withOpacity(0.18),
-                            AppColors.cyanAccent.withOpacity(0.0),
+                            cyanAccent.withValues(alpha: 0.18),
+                            cyanAccent.withValues(alpha: 0.0),
                           ],
                         ),
                       ),

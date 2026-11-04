@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_mobx/flutter_mobx.dart';
-import 'core/constants/app_colors.dart';
 import 'core/di/injection.dart';
 import 'core/network/network_monitor.dart';
 import 'core/theme/app_theme.dart';
@@ -106,6 +105,9 @@ class _MainNavigationShellState extends State<MainNavigationShell> {
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final colorScheme = theme.colorScheme;
+
     return AdaptiveScaffold(
       currentIndex: _currentIndex,
       onNavigationIndexChanged: (index) {
@@ -119,11 +121,11 @@ class _MainNavigationShellState extends State<MainNavigationShell> {
               width: 26,
               height: 26,
               decoration: BoxDecoration(
-                color: AppColors.emeraldPrimary.withOpacity(0.2),
+                color: colorScheme.primary.withValues(alpha: 0.2),
                 shape: BoxShape.circle,
-                border: Border.all(color: AppColors.emeraldPrimary, width: 1.5),
+                border: Border.all(color: colorScheme.primary, width: 1.5),
               ),
-              child: const Icon(Icons.bolt_rounded, size: 16, color: AppColors.emeraldPrimary),
+              child: Icon(Icons.bolt_rounded, size: 16, color: colorScheme.primary),
             ),
             const SizedBox(width: 10),
             const Text(
@@ -143,7 +145,7 @@ class _MainNavigationShellState extends State<MainNavigationShell> {
                 MaterialPageRoute(builder: (_) => const AiCoachView()),
               );
             },
-            icon: const Icon(Icons.auto_awesome_rounded, color: AppColors.emeraldPrimary),
+            icon: Icon(Icons.auto_awesome_rounded, color: colorScheme.primary),
             tooltip: 'On-Device AI Coach',
           ),
           IconButton(
@@ -152,7 +154,7 @@ class _MainNavigationShellState extends State<MainNavigationShell> {
                 MaterialPageRoute(builder: (_) => const SettingsView()),
               );
             },
-            icon: const Icon(Icons.settings_outlined, color: AppColors.darkTextSecondary),
+            icon: Icon(Icons.settings_outlined, color: colorScheme.onSurfaceVariant),
             tooltip: 'Settings & Telemetry',
           ),
         ],

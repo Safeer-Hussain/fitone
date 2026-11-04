@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import '../../../core/constants/app_colors.dart';
 import '../../../domain/entities/exercise.dart';
 
 class ExerciseCard extends StatelessWidget {
@@ -16,6 +15,9 @@ class ExerciseCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final colorScheme = theme.colorScheme;
+
     return Card(
       margin: const EdgeInsets.only(bottom: 10),
       child: InkWell(
@@ -25,6 +27,7 @@ class ExerciseCard extends StatelessWidget {
           padding: const EdgeInsets.all(16),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
+            mainAxisSize: MainAxisSize.min,
             children: [
               Row(
                 crossAxisAlignment: CrossAxisAlignment.start,
@@ -35,18 +38,20 @@ class ExerciseCard extends StatelessWidget {
                       children: [
                         Text(
                           exercise.name,
-                          style: const TextStyle(
-                            fontSize: 16,
+                          style: TextStyle(
+                            fontSize: 15,
                             fontWeight: FontWeight.w700,
-                            color: Colors.white,
+                            color: colorScheme.onSurface,
                           ),
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
                         ),
                         const SizedBox(height: 4),
                         Text(
                           exercise.targetMuscles,
-                          style: const TextStyle(
+                          style: TextStyle(
                             fontSize: 12,
-                            color: AppColors.darkTextSecondary,
+                            color: colorScheme.onSurfaceVariant,
                           ),
                           maxLines: 1,
                           overflow: TextOverflow.ellipsis,
@@ -57,21 +62,21 @@ class ExerciseCard extends StatelessWidget {
                   if (onAddSet != null)
                     IconButton(
                       onPressed: onAddSet,
-                      icon: const Icon(Icons.add_circle_outline_rounded, color: AppColors.emeraldPrimary),
+                      icon: Icon(Icons.add_circle_outline_rounded, color: colorScheme.primary),
                       tooltip: 'Log Set',
                     )
                   else
-                    const Icon(Icons.chevron_right_rounded, color: AppColors.darkTextMuted),
+                    Icon(Icons.chevron_right_rounded, color: colorScheme.onSurfaceVariant),
                 ],
               ),
-              const SizedBox(height: 12),
-              Row(
+              const SizedBox(height: 10),
+              Wrap(
+                spacing: 6,
+                runSpacing: 4,
                 children: [
-                  _Badge(label: exercise.bodyPart, color: AppColors.cyanAccent),
-                  const SizedBox(width: 8),
-                  _Badge(label: exercise.equipment, color: AppColors.emeraldPrimary),
-                  const SizedBox(width: 8),
-                  _Badge(label: exercise.difficulty, color: AppColors.orangeAccent),
+                  _Badge(label: exercise.bodyPart, color: colorScheme.secondary),
+                  _Badge(label: exercise.equipment, color: colorScheme.primary),
+                  _Badge(label: exercise.difficulty, color: const Color(0xFFFF9100)),
                 ],
               ),
             ],
@@ -93,9 +98,9 @@ class _Badge extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
       decoration: BoxDecoration(
-        color: color.withOpacity(0.12),
+        color: color.withValues(alpha: 0.12),
         borderRadius: BorderRadius.circular(6),
-        border: Border.all(color: color.withOpacity(0.25)),
+        border: Border.all(color: color.withValues(alpha: 0.25)),
       ),
       child: Text(
         label,
@@ -104,6 +109,8 @@ class _Badge extends StatelessWidget {
           fontSize: 10,
           fontWeight: FontWeight.w700,
         ),
+        maxLines: 1,
+        overflow: TextOverflow.ellipsis,
       ),
     );
   }

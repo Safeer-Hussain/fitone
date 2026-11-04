@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import '../constants/app_colors.dart';
 
 class ShimmerLoader extends StatefulWidget {
   final double width;
@@ -37,9 +36,9 @@ class _ShimmerLoaderState extends State<ShimmerLoader> with SingleTickerProvider
 
   @override
   Widget build(BuildContext context) {
-    final isDark = Theme.of(context).brightness == Brightness.dark;
-    final baseColor = isDark ? AppColors.darkSurfaceElevated : const Color(0xFFE2E8F0);
-    final highlightColor = isDark ? AppColors.darkSurfaceHighlight : const Color(0xFFF8FAFC);
+    final colorScheme = Theme.of(context).colorScheme;
+    final baseColor = colorScheme.surfaceContainer;
+    final highlightColor = colorScheme.surfaceContainerHighest;
 
     return AnimatedBuilder(
       animation: _controller,

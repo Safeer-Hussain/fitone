@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import '../../../core/constants/app_colors.dart';
 import '../../../domain/entities/social_post.dart';
 import '../stores/social_store.dart';
 
@@ -25,9 +24,16 @@ class _SocialPostCardState extends State<SocialPostCard> {
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final colorScheme = theme.colorScheme;
     final post = widget.post;
 
     return Card(
+      color: colorScheme.surface,
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(16),
+        side: BorderSide(color: colorScheme.outlineVariant),
+      ),
       margin: const EdgeInsets.only(bottom: 14),
       child: Padding(
         padding: const EdgeInsets.all(16),
@@ -38,10 +44,10 @@ class _SocialPostCardState extends State<SocialPostCard> {
               children: [
                 CircleAvatar(
                   radius: 18,
-                  backgroundColor: AppColors.emeraldPrimary.withOpacity(0.18),
+                  backgroundColor: colorScheme.primary.withValues(alpha: 0.18),
                   child: Text(
                     post.avatarInitials,
-                    style: const TextStyle(fontWeight: FontWeight.w800, color: AppColors.emeraldPrimary, fontSize: 13),
+                    style: TextStyle(fontWeight: FontWeight.w800, color: colorScheme.primary, fontSize: 13),
                   ),
                 ),
                 const SizedBox(width: 10),
@@ -49,23 +55,35 @@ class _SocialPostCardState extends State<SocialPostCard> {
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      Text(post.userName, style: const TextStyle(fontWeight: FontWeight.w700, fontSize: 14, color: Colors.white)),
-                      Text(post.userHandle, style: const TextStyle(fontSize: 11, color: AppColors.darkTextMuted)),
+                      Text(
+                        post.userName,
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
+                        style: TextStyle(fontWeight: FontWeight.w700, fontSize: 14, color: colorScheme.onSurface),
+                      ),
+                      Text(
+                        post.userHandle,
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
+                        style: TextStyle(fontSize: 11, color: colorScheme.onSurfaceVariant),
+                      ),
                     ],
                   ),
                 ),
-                _PostTypeBadge(type: post.postType),
+                _PostTypeBadge(type: post.postType, colorScheme: colorScheme),
               ],
             ),
             const SizedBox(height: 12),
             Text(
               post.title,
-              style: const TextStyle(fontSize: 16, fontWeight: FontWeight.w700, color: Colors.white),
+              maxLines: 2,
+              overflow: TextOverflow.ellipsis,
+              style: TextStyle(fontSize: 16, fontWeight: FontWeight.w700, color: colorScheme.onSurface),
             ),
             const SizedBox(height: 6),
             Text(
               post.description,
-              style: const TextStyle(fontSize: 13, color: AppColors.darkTextSecondary, height: 1.45),
+              style: TextStyle(fontSize: 13, color: colorScheme.onSurfaceVariant, height: 1.45),
             ),
             const SizedBox(height: 12),
             Wrap(
@@ -75,19 +93,19 @@ class _SocialPostCardState extends State<SocialPostCard> {
                 return Container(
                   padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
                   decoration: BoxDecoration(
-                    color: AppColors.darkSurfaceElevated,
+                    color: colorScheme.surfaceContainerHighest,
                     borderRadius: BorderRadius.circular(8),
-                    border: Border.all(color: AppColors.darkBorder),
+                    border: Border.all(color: colorScheme.outlineVariant),
                   ),
                   child: Text(
                     '${entry.key}: ${entry.value}',
-                    style: const TextStyle(fontSize: 11, fontWeight: FontWeight.w600, color: AppColors.cyanAccent),
+                    style: TextStyle(fontSize: 11, fontWeight: FontWeight.w600, color: colorScheme.secondary),
                   ),
                 );
               }).toList(),
             ),
             const SizedBox(height: 14),
-            const Divider(color: AppColors.darkBorder),
+            Divider(color: colorScheme.outlineVariant),
             const SizedBox(height: 8),
             Row(
               children: [
@@ -95,27 +113,33 @@ class _SocialPostCardState extends State<SocialPostCard> {
                   onPressed: () => widget.store.toggleLike(post.id),
                   icon: Icon(
                     post.isLiked ? Icons.favorite_rounded : Icons.favorite_border_rounded,
-                    color: post.isLiked ? AppColors.redAccent : AppColors.darkTextSecondary,
+                    color: post.isLiked ? colorScheme.error : colorScheme.onSurfaceVariant,
                     size: 20,
                   ),
                 ),
-                Text('${post.likesCount}', style: const TextStyle(fontSize: 12, fontWeight: FontWeight.w700, color: AppColors.darkTextSecondary)),
+                Text(
+                  '${post.likesCount}',
+                  style: TextStyle(fontSize: 12, fontWeight: FontWeight.w700, color: colorScheme.onSurfaceVariant),
+                ),
                 const SizedBox(width: 16),
                 IconButton(
                   onPressed: () => setState(() => _showComments = !_showComments),
-                  icon: const Icon(Icons.mode_comment_outlined, size: 19, color: AppColors.darkTextSecondary),
+                  icon: Icon(Icons.mode_comment_outlined, size: 19, color: colorScheme.onSurfaceVariant),
                 ),
-                Text('${post.comments.length}', style: const TextStyle(fontSize: 12, fontWeight: FontWeight.w700, color: AppColors.darkTextSecondary)),
+                Text(
+                  '${post.comments.length}',
+                  style: TextStyle(fontSize: 12, fontWeight: FontWeight.w700, color: colorScheme.onSurfaceVariant),
+                ),
                 const Spacer(),
                 IconButton(
                   onPressed: () {},
-                  icon: const Icon(Icons.share_outlined, size: 19, color: AppColors.darkTextSecondary),
+                  icon: Icon(Icons.share_outlined, size: 19, color: colorScheme.onSurfaceVariant),
                 ),
               ],
             ),
             if (_showComments) ...[
               const SizedBox(height: 10),
-              const Divider(color: AppColors.darkBorder),
+              Divider(color: colorScheme.outlineVariant),
               const SizedBox(height: 8),
               Column(
                 children: post.comments.map((c) {
@@ -124,9 +148,15 @@ class _SocialPostCardState extends State<SocialPostCard> {
                     child: Row(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        Text('${c.author}: ', style: const TextStyle(fontWeight: FontWeight.w700, fontSize: 12, color: AppColors.cyanAccent)),
+                        Text(
+                          '${c.author}: ',
+                          style: TextStyle(fontWeight: FontWeight.w700, fontSize: 12, color: colorScheme.secondary),
+                        ),
                         Expanded(
-                          child: Text(c.text, style: const TextStyle(fontSize: 12, color: AppColors.darkTextSecondary)),
+                          child: Text(
+                            c.text,
+                            style: TextStyle(fontSize: 12, color: colorScheme.onSurfaceVariant),
+                          ),
                         ),
                       ],
                     ),
@@ -138,9 +168,10 @@ class _SocialPostCardState extends State<SocialPostCard> {
                   Expanded(
                     child: TextField(
                       controller: _commentController,
-                      decoration: const InputDecoration(
+                      decoration: InputDecoration(
                         hintText: 'Add an authentic comment...',
-                        contentPadding: EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+                        contentPadding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+                        hintStyle: TextStyle(color: colorScheme.onSurfaceVariant),
                       ),
                     ),
                   ),
@@ -150,7 +181,7 @@ class _SocialPostCardState extends State<SocialPostCard> {
                       widget.store.addComment(post.id, _commentController.text);
                       _commentController.clear();
                     },
-                    icon: const Icon(Icons.send_rounded, color: AppColors.emeraldPrimary, size: 18),
+                    icon: Icon(Icons.send_rounded, color: colorScheme.primary, size: 18),
                   ),
                 ],
               ),
@@ -164,28 +195,29 @@ class _SocialPostCardState extends State<SocialPostCard> {
 
 class _PostTypeBadge extends StatelessWidget {
   final String type;
+  final ColorScheme colorScheme;
 
-  const _PostTypeBadge({required this.type});
+  const _PostTypeBadge({required this.type, required this.colorScheme});
 
   @override
   Widget build(BuildContext context) {
-    Color color = AppColors.emeraldPrimary;
+    Color color = colorScheme.primary;
     String label = 'Milestone';
 
     if (type.contains('RUN')) {
-      color = AppColors.cyanAccent;
+      color = colorScheme.secondary;
       label = 'GPS Run';
     } else if (type.contains('RECOVERY')) {
-      color = AppColors.purpleAccent;
+      color = colorScheme.tertiary;
       label = 'Ring Recovery';
     }
 
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
       decoration: BoxDecoration(
-        color: color.withOpacity(0.15),
+        color: color.withValues(alpha: 0.15),
         borderRadius: BorderRadius.circular(6),
-        border: Border.all(color: color.withOpacity(0.3)),
+        border: Border.all(color: color.withValues(alpha: 0.3)),
       ),
       child: Text(label, style: TextStyle(color: color, fontSize: 10, fontWeight: FontWeight.w700)),
     );

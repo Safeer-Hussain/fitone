@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import '../constants/app_colors.dart';
 import 'offline_banner.dart';
 
 class AdaptiveScaffoldDestination {
@@ -36,6 +35,9 @@ class AdaptiveScaffold extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final colorScheme = theme.colorScheme;
+
     return OrientationBuilder(
       builder: (context, orientation) {
         return LayoutBuilder(
@@ -57,30 +59,30 @@ class AdaptiveScaffold extends StatelessWidget {
                             selectedIndex: currentIndex,
                             onDestinationSelected: onNavigationIndexChanged,
                             labelType: NavigationRailLabelType.all,
-                            backgroundColor: Theme.of(context).cardTheme.color,
-                            indicatorColor: AppColors.emeraldPrimary.withOpacity(0.18),
+                            backgroundColor: colorScheme.surface,
+                            indicatorColor: colorScheme.primary.withValues(alpha: 0.18),
                             leading: Padding(
-                              padding: const EdgeInsets.symmetric(vertical: 16),
+                              padding: const EdgeInsets.symmetric(vertical: 12),
                               child: Container(
-                                width: 40,
-                                height: 40,
+                                width: 38,
+                                height: 38,
                                 decoration: BoxDecoration(
-                                  color: AppColors.emeraldPrimary.withOpacity(0.15),
+                                  color: colorScheme.primary.withValues(alpha: 0.15),
                                   shape: BoxShape.circle,
-                                  border: Border.all(color: AppColors.emeraldPrimary, width: 1.5),
+                                  border: Border.all(color: colorScheme.primary, width: 1.5),
                                 ),
-                                child: const Icon(Icons.bolt_rounded, color: AppColors.emeraldPrimary, size: 22),
+                                child: Icon(Icons.bolt_rounded, color: colorScheme.primary, size: 20),
                               ),
                             ),
                             destinations: destinations.map((d) {
                               return NavigationRailDestination(
                                 icon: Icon(d.icon),
-                                selectedIcon: Icon(d.selectedIcon, color: AppColors.emeraldPrimary),
+                                selectedIcon: Icon(d.selectedIcon, color: colorScheme.primary),
                                 label: Text(d.label),
                               );
                             }).toList(),
                           ),
-                          const VerticalDivider(width: 1, thickness: 1, color: AppColors.darkBorder),
+                          VerticalDivider(width: 1, thickness: 1, color: colorScheme.outlineVariant),
                           Expanded(child: body),
                         ],
                       ),

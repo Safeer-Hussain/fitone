@@ -1,6 +1,5 @@
 import 'package:fl_chart/fl_chart.dart';
 import 'package:flutter/material.dart';
-import '../../../core/constants/app_colors.dart';
 import '../../../core/constants/app_typography.dart';
 
 class EcgWaveformCard extends StatelessWidget {
@@ -21,6 +20,9 @@ class EcgWaveformCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final colorScheme = theme.colorScheme;
+
     final spots = List<FlSpot>.generate(
       ecgBuffer.length,
       (index) => FlSpot(index.toDouble(), ecgBuffer[index]),
@@ -40,29 +42,29 @@ class EcgWaveformCard extends StatelessWidget {
                     Container(
                       width: 8,
                       height: 8,
-                      decoration: const BoxDecoration(
-                        color: AppColors.emeraldPrimary,
+                      decoration: BoxDecoration(
+                        color: colorScheme.primary,
                         shape: BoxShape.circle,
                       ),
                     ),
                     const SizedBox(width: 8),
-                    const Text(
+                    Text(
                       'LIVE PPG TELEMETRY',
                       style: TextStyle(
                         fontSize: 12,
                         fontWeight: FontWeight.w700,
                         letterSpacing: 0.8,
-                        color: AppColors.darkTextSecondary,
+                        color: colorScheme.onSurfaceVariant,
                       ),
                     ),
                   ],
                 ),
                 Text(
                   'Signal $signalQuality%',
-                  style: const TextStyle(
+                  style: TextStyle(
                     fontSize: 11,
                     fontWeight: FontWeight.w600,
-                    color: AppColors.emeraldPrimary,
+                    color: colorScheme.primary,
                   ),
                 ),
               ],
@@ -73,33 +75,38 @@ class EcgWaveformCard extends StatelessWidget {
               children: [
                 Text(
                   '$heartRate',
-                  style: AppTypography.metricLarge.copyWith(color: Colors.white),
+                  style: AppTypography.metricLarge.copyWith(color: colorScheme.onSurface),
                 ),
-                const Padding(
-                  padding: EdgeInsets.only(bottom: 8.0, left: 6),
+                Padding(
+                  padding: const EdgeInsets.only(bottom: 8.0, left: 6),
                   child: Text(
                     'BPM',
                     style: TextStyle(
                       fontSize: 13,
                       fontWeight: FontWeight.w700,
-                      color: AppColors.darkTextSecondary,
+                      color: colorScheme.onSurfaceVariant,
                     ),
                   ),
                 ),
                 const Spacer(),
                 _TelemetryTag(label: 'SpO2', value: '$spo2%'),
-                const SizedBox(width: 12),
+                const SizedBox(width: 10),
                 _TelemetryTag(
                   label: 'Skin Temp',
                   value: '${skinTempDelta >= 0 ? "+" : ""}${skinTempDelta.toStringAsFixed(1)}C',
                 ),
               ],
             ),
-            const SizedBox(height: 20),
+            const SizedBox(height: 16),
             SizedBox(
               height: 90,
               child: spots.isEmpty
-                  ? const Center(child: Text('Synchronizing waveform stream...', style: TextStyle(color: AppColors.darkTextMuted, fontSize: 12)))
+                  ? Center(
+                      child: Text(
+                        'Synchronizing waveform stream...',
+                        style: TextStyle(color: colorScheme.onSurfaceVariant, fontSize: 12),
+                      ),
+                    )
                   : LineChart(
                       LineChartData(
                         minX: 0,
@@ -114,7 +121,7 @@ class EcgWaveformCard extends StatelessWidget {
                             spots: spots,
                             isCurved: true,
                             curveSmoothness: 0.35,
-                            color: AppColors.emeraldPrimary,
+                            color: colorScheme.primary,
                             barWidth: 2.2,
                             isStrokeCapRound: true,
                             dotData: const FlDotData(show: false),
@@ -124,8 +131,8 @@ class EcgWaveformCard extends StatelessWidget {
                                 begin: Alignment.topCenter,
                                 end: Alignment.bottomCenter,
                                 colors: [
-                                  AppColors.emeraldPrimary.withOpacity(0.22),
-                                  AppColors.emeraldPrimary.withOpacity(0.0),
+                                  colorScheme.primary.withValues(alpha: 0.22),
+                                  colorScheme.primary.withValues(alpha: 0.0),
                                 ],
                               ),
                             ),
@@ -149,19 +156,35 @@ class _TelemetryTag extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final colorScheme = Theme.of(context).colorScheme;
+
     return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
       decoration: BoxDecoration(
-        color: AppColors.darkSurfaceElevated,
+        color: colorScheme.surfaceContainer,
         borderRadius: BorderRadius.circular(10),
-        border: Border.all(color: AppColors.darkBorder),
+        border: Border.all(color: colorScheme.outlineVariant),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Text(label, style: const TextStyle(fontSize: 10, color: AppColors.darkTextMuted, fontWeight: FontWeight.w600)),
+          Text(
+            label,
+            style: TextStyle(
+              fontSize: 10,
+              color: colorScheme.onSurfaceVariant,
+              fontWeight: FontWeight.w600,
+            ),
+          ),
           const SizedBox(height: 2),
-          Text(value, style: const TextStyle(fontSize: 12, color: Colors.white, fontWeight: FontWeight.w700)),
+          Text(
+            value,
+            style: TextStyle(
+              fontSize: 12,
+              color: colorScheme.onSurface,
+              fontWeight: FontWeight.w700,
+            ),
+          ),
         ],
       ),
     );

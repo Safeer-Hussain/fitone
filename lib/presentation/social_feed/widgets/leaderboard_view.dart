@@ -1,11 +1,13 @@
 import 'package:flutter/material.dart';
-import '../../../core/constants/app_colors.dart';
 
 class LeaderboardView extends StatelessWidget {
   const LeaderboardView({super.key});
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final colorScheme = theme.colorScheme;
+
     final athletes = [
       {'rank': 1, 'name': 'Safeer Hussain', 'handle': '@safeer_h', 'volume': '18,450 kg', 'distance': '42.8 km', 'isUser': true},
       {'rank': 2, 'name': 'Zainab Tariq', 'handle': '@zainab_runs', 'volume': '14,200 kg', 'distance': '58.4 km', 'isUser': false},
@@ -20,20 +22,26 @@ class LeaderboardView extends StatelessWidget {
         Container(
           padding: const EdgeInsets.all(16),
           decoration: BoxDecoration(
-            color: AppColors.darkSurface,
+            color: colorScheme.surface,
             borderRadius: BorderRadius.circular(16),
-            border: Border.all(color: AppColors.emeraldPrimary.withOpacity(0.4)),
+            border: Border.all(color: colorScheme.primary.withValues(alpha: 0.4)),
           ),
-          child: const Row(
+          child: Row(
             children: [
-              Icon(Icons.emoji_events_outlined, color: AppColors.emeraldPrimary, size: 28),
-              SizedBox(width: 14),
+              Icon(Icons.military_tech_outlined, color: colorScheme.primary, size: 28),
+              const SizedBox(width: 14),
               Expanded(
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Text('Global Tonnage & Distance League', style: TextStyle(fontWeight: FontWeight.w700, fontSize: 14, color: Colors.white)),
-                    Text('Weekly cohort resetting in 2 days 14 hours', style: TextStyle(fontSize: 11, color: AppColors.darkTextSecondary)),
+                    Text(
+                      'Global Tonnage & Distance League',
+                      style: TextStyle(fontWeight: FontWeight.w700, fontSize: 14, color: colorScheme.onSurface),
+                    ),
+                    Text(
+                      'Weekly cohort resetting in 2 days 14 hours',
+                      style: TextStyle(fontSize: 11, color: colorScheme.onSurfaceVariant),
+                    ),
                   ],
                 ),
               ),
@@ -49,10 +57,10 @@ class LeaderboardView extends StatelessWidget {
             margin: const EdgeInsets.only(bottom: 10),
             padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
             decoration: BoxDecoration(
-              color: isUser ? AppColors.emeraldPrimary.withOpacity(0.12) : AppColors.darkSurface,
+              color: isUser ? colorScheme.primary.withValues(alpha: 0.12) : colorScheme.surface,
               borderRadius: BorderRadius.circular(12),
               border: Border.all(
-                color: isUser ? AppColors.emeraldPrimary : AppColors.darkBorder,
+                color: isUser ? colorScheme.primary : colorScheme.outlineVariant,
                 width: isUser ? 1.5 : 1.0,
               ),
             ),
@@ -65,7 +73,7 @@ class LeaderboardView extends StatelessWidget {
                   decoration: BoxDecoration(
                     color: rank == 1
                         ? const Color(0xFFEAB308)
-                        : (rank == 2 ? const Color(0xFF94A3B8) : (rank == 3 ? const Color(0xFFB45309) : AppColors.darkSurfaceElevated)),
+                        : (rank == 2 ? const Color(0xFF94A3B8) : (rank == 3 ? const Color(0xFFB45309) : colorScheme.surfaceContainerHighest)),
                     shape: BoxShape.circle,
                   ),
                   child: Text(
@@ -73,7 +81,7 @@ class LeaderboardView extends StatelessWidget {
                     style: TextStyle(
                       fontWeight: FontWeight.w800,
                       fontSize: 12,
-                      color: rank <= 3 ? Colors.black : Colors.white,
+                      color: rank <= 3 ? Colors.black : colorScheme.onSurface,
                     ),
                   ),
                 ),
@@ -84,29 +92,50 @@ class LeaderboardView extends StatelessWidget {
                     children: [
                       Row(
                         children: [
-                          Text(a['name'] as String, style: const TextStyle(fontWeight: FontWeight.w700, fontSize: 14, color: Colors.white)),
+                          Flexible(
+                            child: Text(
+                              a['name'] as String,
+                              maxLines: 1,
+                              overflow: TextOverflow.ellipsis,
+                              style: TextStyle(fontWeight: FontWeight.w700, fontSize: 14, color: colorScheme.onSurface),
+                            ),
+                          ),
                           if (isUser) ...[
                             const SizedBox(width: 6),
                             Container(
                               padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 1),
                               decoration: BoxDecoration(
-                                color: AppColors.emeraldPrimary.withOpacity(0.2),
+                                color: colorScheme.primary.withValues(alpha: 0.2),
                                 borderRadius: BorderRadius.circular(4),
                               ),
-                              child: const Text('YOU', style: TextStyle(fontSize: 9, fontWeight: FontWeight.w800, color: AppColors.emeraldPrimary)),
+                              child: Text(
+                                'YOU',
+                                style: TextStyle(fontSize: 9, fontWeight: FontWeight.w800, color: colorScheme.primary),
+                              ),
                             ),
                           ],
                         ],
                       ),
-                      Text(a['handle'] as String, style: const TextStyle(fontSize: 11, color: AppColors.darkTextMuted)),
+                      Text(
+                        a['handle'] as String,
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
+                        style: TextStyle(fontSize: 11, color: colorScheme.onSurfaceVariant),
+                      ),
                     ],
                   ),
                 ),
                 Column(
                   crossAxisAlignment: CrossAxisAlignment.end,
                   children: [
-                    Text(a['volume'] as String, style: const TextStyle(fontWeight: FontWeight.w700, fontSize: 13, color: AppColors.emeraldPrimary)),
-                    Text(a['distance'] as String, style: const TextStyle(fontSize: 11, color: AppColors.cyanAccent)),
+                    Text(
+                      a['volume'] as String,
+                      style: TextStyle(fontWeight: FontWeight.w700, fontSize: 13, color: colorScheme.primary),
+                    ),
+                    Text(
+                      a['distance'] as String,
+                      style: TextStyle(fontSize: 11, color: colorScheme.secondary),
+                    ),
                   ],
                 ),
               ],

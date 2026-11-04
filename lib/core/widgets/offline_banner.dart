@@ -7,6 +7,12 @@ class OfflineBanner extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final colorScheme = theme.colorScheme;
+    final warningColor = theme.brightness == Brightness.dark
+        ? const Color(0xFFF59E0B)
+        : const Color(0xFFD97706);
+
     return Observer(
       builder: (_) {
         final isOnline = NetworkMonitor.instance.isOnline;
@@ -19,41 +25,43 @@ class OfflineBanner extends StatelessWidget {
           secondChild: Container(
             width: double.infinity,
             padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-            decoration: const BoxDecoration(
-              color: Color(0xFF1E293B),
+            decoration: BoxDecoration(
+              color: colorScheme.surfaceContainerHighest,
               border: Border(
-                bottom: BorderSide(color: Color(0xFFF59E0B), width: 1.5),
+                bottom: BorderSide(color: warningColor, width: 1.5),
               ),
             ),
             child: Row(
               children: [
-                const Icon(
+                Icon(
                   Icons.wifi_off_rounded,
-                  color: Color(0xFFF59E0B),
+                  color: warningColor,
                   size: 16,
                 ),
                 const SizedBox(width: 10),
-                const Expanded(
+                Expanded(
                   child: Text(
                     'Offline Mode - Serving cached SQLite local data',
                     style: TextStyle(
-                      color: Colors.white,
+                      color: colorScheme.onSurface,
                       fontSize: 12,
                       fontWeight: FontWeight.w600,
                     ),
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
                   ),
                 ),
                 if (pendingCount > 0)
                   Container(
                     padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
                     decoration: BoxDecoration(
-                      color: const Color(0xFFF59E0B).withOpacity(0.2),
+                      color: warningColor.withValues(alpha: 0.18),
                       borderRadius: BorderRadius.circular(10),
                     ),
                     child: Text(
                       '$pendingCount Queued',
-                      style: const TextStyle(
-                        color: Color(0xFFF59E0B),
+                      style: TextStyle(
+                        color: warningColor,
                         fontSize: 11,
                         fontWeight: FontWeight.w700,
                       ),

@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import '../../../core/constants/app_colors.dart';
 
 class ReasoningChip extends StatelessWidget {
   final String reasoning;
@@ -8,31 +7,36 @@ class ReasoningChip extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final colorScheme = theme.colorScheme;
+
     return Container(
       margin: const EdgeInsets.symmetric(vertical: 6),
       padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
       decoration: BoxDecoration(
-        color: AppColors.purpleAccent.withOpacity(0.12),
+        color: colorScheme.tertiary.withValues(alpha: 0.12),
         borderRadius: BorderRadius.circular(12),
-        border: Border.all(color: AppColors.purpleAccent.withOpacity(0.35)),
+        border: Border.all(color: colorScheme.tertiary.withValues(alpha: 0.35)),
       ),
       child: Row(
         mainAxisSize: MainAxisSize.min,
         children: [
-          const SizedBox(
+          SizedBox(
             width: 14,
             height: 14,
             child: CircularProgressIndicator(
               strokeWidth: 2,
-              valueColor: AlwaysStoppedAnimation(AppColors.purpleAccent),
+              valueColor: AlwaysStoppedAnimation(colorScheme.tertiary),
             ),
           ),
           const SizedBox(width: 10),
           Expanded(
             child: Text(
               reasoning,
-              style: const TextStyle(
-                color: Color(0xFFD8B4FE),
+              maxLines: 2,
+              overflow: TextOverflow.ellipsis,
+              style: TextStyle(
+                color: colorScheme.onSurface,
                 fontSize: 11,
                 fontStyle: FontStyle.italic,
               ),
