@@ -33,6 +33,41 @@ class AdaptiveScaffold extends StatelessWidget {
     this.endDrawer,
   });
 
+  PreferredSizeWidget? _buildLandscapeAppBar(BuildContext context, PreferredSizeWidget? original) {
+    if (original == null) return null;
+    if (original is AppBar) {
+      return PreferredSize(
+        preferredSize: const Size.fromHeight(36),
+        child: AppBar(
+          toolbarHeight: 36,
+          elevation: 0,
+          scrolledUnderElevation: 0,
+          titleSpacing: 8,
+          leadingWidth: original.leading != null ? 36 : null,
+          leading: original.leading,
+          title: DefaultTextStyle.merge(
+            style: const TextStyle(fontSize: 13, fontWeight: FontWeight.w800),
+            child: original.title ?? const SizedBox.shrink(),
+          ),
+          actions: original.actions?.map((action) {
+            if (action is IconButton) {
+              return IconButton(
+                onPressed: action.onPressed,
+                icon: action.icon,
+                tooltip: action.tooltip,
+                iconSize: 18,
+                padding: const EdgeInsets.symmetric(horizontal: 4),
+                constraints: const BoxConstraints(minWidth: 32, minHeight: 32),
+              );
+            }
+            return action;
+          }).toList(),
+        ),
+      );
+    }
+    return original;
+  }
+
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
@@ -46,7 +81,7 @@ class AdaptiveScaffold extends StatelessWidget {
 
             if (isLandscape) {
               return Scaffold(
-                appBar: appBar,
+                appBar: _buildLandscapeAppBar(context, appBar),
                 endDrawer: endDrawer,
                 floatingActionButton: floatingActionButton,
                 body: Column(
@@ -55,32 +90,35 @@ class AdaptiveScaffold extends StatelessWidget {
                     Expanded(
                       child: Row(
                         children: [
-                          NavigationRail(
-                            selectedIndex: currentIndex,
-                            onDestinationSelected: onNavigationIndexChanged,
-                            labelType: NavigationRailLabelType.all,
-                            backgroundColor: colorScheme.surface,
-                            indicatorColor: colorScheme.primary.withValues(alpha: 0.18),
-                            leading: Padding(
-                              padding: const EdgeInsets.symmetric(vertical: 12),
-                              child: Container(
-                                width: 38,
-                                height: 38,
-                                decoration: BoxDecoration(
-                                  color: colorScheme.primary.withValues(alpha: 0.15),
-                                  shape: BoxShape.circle,
-                                  border: Border.all(color: colorScheme.primary, width: 1.5),
-                                ),
-                                child: Icon(Icons.bolt_rounded, color: colorScheme.primary, size: 20),
-                              ),
+                          SizedBox(
+                            width: 56,
+                            child: LayoutBuilder(
+                              builder: (context, railConstraints) {
+                                return SingleChildScrollView(
+                                  physics: const ClampingScrollPhysics(),
+                                  child: ConstrainedBox(
+                                    constraints: BoxConstraints(minHeight: railConstraints.maxHeight),
+                                    child: IntrinsicHeight(
+                                      child: NavigationRail(
+                                        minWidth: 56,
+                                        selectedIndex: currentIndex,
+                                        onDestinationSelected: onNavigationIndexChanged,
+                                        labelType: NavigationRailLabelType.none,
+                                        backgroundColor: colorScheme.surface,
+                                        indicatorColor: colorScheme.primary.withValues(alpha: 0.18),
+                                        destinations: destinations.map((d) {
+                                          return NavigationRailDestination(
+                                            icon: Icon(d.icon, size: 22),
+                                            selectedIcon: Icon(d.selectedIcon, size: 22, color: colorScheme.primary),
+                                            label: Text(d.label),
+                                          );
+                                        }).toList(),
+                                      ),
+                                    ),
+                                  ),
+                                );
+                              },
                             ),
-                            destinations: destinations.map((d) {
-                              return NavigationRailDestination(
-                                icon: Icon(d.icon),
-                                selectedIcon: Icon(d.selectedIcon, color: colorScheme.primary),
-                                label: Text(d.label),
-                              );
-                            }).toList(),
                           ),
                           VerticalDivider(width: 1, thickness: 1, color: colorScheme.outlineVariant),
                           Expanded(child: body),

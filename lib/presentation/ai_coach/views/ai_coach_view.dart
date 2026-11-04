@@ -61,7 +61,8 @@ class _AiCoachViewState extends State<AiCoachView> {
 
               return ListView.builder(
                 controller: _scrollController,
-                padding: const EdgeInsets.all(16),
+                physics: const ClampingScrollPhysics(),
+                padding: EdgeInsets.all(isLandscape ? 10 : 16),
                 itemCount: messages.length,
                 itemBuilder: (context, index) {
                   return ChatMessageBubble(message: messages[index]);
@@ -73,7 +74,12 @@ class _AiCoachViewState extends State<AiCoachView> {
 
         Widget buildInputField() {
           return Container(
-            padding: const EdgeInsets.fromLTRB(16, 8, 16, 16),
+            padding: EdgeInsets.fromLTRB(
+              isLandscape ? 10 : 16,
+              isLandscape ? 4 : 8,
+              isLandscape ? 10 : 16,
+              (isLandscape ? 6 : 16) + MediaQuery.of(context).viewInsets.bottom,
+            ),
             decoration: BoxDecoration(
               color: colorScheme.surface,
               border: Border(top: BorderSide(color: colorScheme.outlineVariant)),
@@ -81,18 +87,28 @@ class _AiCoachViewState extends State<AiCoachView> {
             child: Row(
               children: [
                 Expanded(
-                  child: TextField(
-                    controller: _textController,
-                    decoration: InputDecoration(
-                      hintText: 'Ask your AI Coach about training, HRV, or macros...',
-                      contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-                      hintStyle: TextStyle(color: colorScheme.onSurfaceVariant),
+                  child: SizedBox(
+                    height: isLandscape ? 38 : null,
+                    child: TextField(
+                      controller: _textController,
+                      decoration: InputDecoration(
+                        hintText: 'Ask AI Coach about HRV, recovery, or macros...',
+                        isDense: true,
+                        contentPadding: EdgeInsets.symmetric(
+                          horizontal: 12,
+                          vertical: isLandscape ? 8 : 12,
+                        ),
+                        hintStyle: TextStyle(
+                          fontSize: isLandscape ? 12 : 14,
+                          color: colorScheme.onSurfaceVariant,
+                        ),
+                      ),
+                      onSubmitted: (text) {
+                        _store.sendUserPrompt(text);
+                        _textController.clear();
+                        _scrollToBottom();
+                      },
                     ),
-                    onSubmitted: (text) {
-                      _store.sendUserPrompt(text);
-                      _textController.clear();
-                      _scrollToBottom();
-                    },
                   ),
                 ),
                 const SizedBox(width: 8),
@@ -105,10 +121,12 @@ class _AiCoachViewState extends State<AiCoachView> {
                             _textController.clear();
                             _scrollToBottom();
                           },
-                    icon: const Icon(Icons.arrow_upward_rounded),
+                    icon: const Icon(Icons.arrow_upward_rounded, size: 18),
                     style: IconButton.styleFrom(
                       backgroundColor: colorScheme.primary,
                       foregroundColor: colorScheme.onPrimary,
+                      padding: const EdgeInsets.all(8),
+                      minimumSize: const Size(36, 36),
                     ),
                   ),
                 ),
@@ -157,7 +175,7 @@ class _AiCoachViewState extends State<AiCoachView> {
           } else {
             return Container(
               color: colorScheme.surface,
-              padding: const EdgeInsets.all(16),
+              padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 8),
               child: SingleChildScrollView(
                 physics: const ClampingScrollPhysics(),
                 child: Column(
@@ -166,26 +184,27 @@ class _AiCoachViewState extends State<AiCoachView> {
                     Text(
                       'AI RECOMMENDATIONS',
                       style: TextStyle(
-                        fontSize: 11,
+                        fontSize: 10,
                         fontWeight: FontWeight.w800,
                         letterSpacing: 0.8,
                         color: colorScheme.primary,
                       ),
                     ),
-                    const SizedBox(height: 12),
+                    const SizedBox(height: 8),
                     ..._store.quickPromptChips.map(
                       (prompt) => Padding(
-                        padding: const EdgeInsets.only(bottom: 8),
+                        padding: const EdgeInsets.only(bottom: 6),
                         child: SizedBox(
                           width: double.infinity,
                           child: ActionChip(
                             backgroundColor: colorScheme.surfaceContainerHighest,
+                            padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 2),
                             label: Text(
                               prompt,
                               maxLines: 2,
                               overflow: TextOverflow.ellipsis,
                               style: TextStyle(
-                                fontSize: 11,
+                                fontSize: 10,
                                 color: colorScheme.primary,
                                 fontWeight: FontWeight.w600,
                               ),
@@ -207,11 +226,15 @@ class _AiCoachViewState extends State<AiCoachView> {
 
         return Scaffold(
           appBar: AppBar(
+            toolbarHeight: isLandscape ? 36 : null,
             title: Row(
               children: [
-                Icon(Icons.auto_awesome_rounded, color: colorScheme.primary, size: 20),
-                const SizedBox(width: 8),
-                const Text('On-Device AI Recovery Coach'),
+                Icon(Icons.auto_awesome_rounded, color: colorScheme.primary, size: isLandscape ? 16 : 20),
+                const SizedBox(width: 6),
+                Text(
+                  'On-Device AI Recovery Coach',
+                  style: TextStyle(fontSize: isLandscape ? 13 : 16, fontWeight: FontWeight.w700),
+                ),
               ],
             ),
           ),
@@ -219,13 +242,15 @@ class _AiCoachViewState extends State<AiCoachView> {
             child: isLandscape
                 ? Row(
                     children: [
+                      // Left Pane (30% width): Scrollable quick-action prompt suggestions
                       Expanded(
-                        flex: 3,
+                        flex: 30,
                         child: buildQuickPromptsList(horizontal: false),
                       ),
                       VerticalDivider(color: colorScheme.outlineVariant, width: 1),
+                      // Right Pane (70% width): Chat transcript with always-visible compact bottom input bar
                       Expanded(
-                        flex: 7,
+                        flex: 70,
                         child: Column(
                           children: [
                             Expanded(child: buildChatList()),

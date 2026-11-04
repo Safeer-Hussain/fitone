@@ -8,6 +8,7 @@ class EcgWaveformCard extends StatelessWidget {
   final int spo2;
   final double skinTempDelta;
   final int signalQuality;
+  final bool isCompact;
 
   const EcgWaveformCard({
     super.key,
@@ -16,6 +17,7 @@ class EcgWaveformCard extends StatelessWidget {
     required this.spo2,
     required this.skinTempDelta,
     required this.signalQuality,
+    this.isCompact = false,
   });
 
   @override
@@ -30,7 +32,7 @@ class EcgWaveformCard extends StatelessWidget {
 
     return Card(
       child: Padding(
-        padding: const EdgeInsets.all(20),
+        padding: EdgeInsets.all(isCompact ? 12 : 20),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
@@ -51,7 +53,7 @@ class EcgWaveformCard extends StatelessWidget {
                     Text(
                       'LIVE PPG TELEMETRY',
                       style: TextStyle(
-                        fontSize: 12,
+                        fontSize: isCompact ? 10 : 12,
                         fontWeight: FontWeight.w700,
                         letterSpacing: 0.8,
                         color: colorScheme.onSurfaceVariant,
@@ -62,84 +64,90 @@ class EcgWaveformCard extends StatelessWidget {
                 Text(
                   'Signal $signalQuality%',
                   style: TextStyle(
-                    fontSize: 11,
+                    fontSize: isCompact ? 10 : 11,
                     fontWeight: FontWeight.w600,
                     color: colorScheme.primary,
                   ),
                 ),
               ],
             ),
-            const SizedBox(height: 16),
+            SizedBox(height: isCompact ? 8 : 16),
             Row(
               crossAxisAlignment: CrossAxisAlignment.end,
               children: [
                 Text(
                   '$heartRate',
-                  style: AppTypography.metricLarge.copyWith(color: colorScheme.onSurface),
+                  style: isCompact
+                      ? TextStyle(fontSize: 26, fontWeight: FontWeight.w800, color: colorScheme.onSurface)
+                      : AppTypography.metricLarge.copyWith(color: colorScheme.onSurface),
                 ),
                 Padding(
-                  padding: const EdgeInsets.only(bottom: 8.0, left: 6),
+                  padding: EdgeInsets.only(bottom: isCompact ? 4.0 : 8.0, left: 6),
                   child: Text(
                     'BPM',
                     style: TextStyle(
-                      fontSize: 13,
+                      fontSize: isCompact ? 11 : 13,
                       fontWeight: FontWeight.w700,
                       color: colorScheme.onSurfaceVariant,
                     ),
                   ),
                 ),
                 const Spacer(),
-                _TelemetryTag(label: 'SpO2', value: '$spo2%'),
-                const SizedBox(width: 10),
+                _TelemetryTag(label: 'SpO2', value: '$spo2%', isCompact: isCompact),
+                const SizedBox(width: 8),
                 _TelemetryTag(
                   label: 'Skin Temp',
                   value: '${skinTempDelta >= 0 ? "+" : ""}${skinTempDelta.toStringAsFixed(1)}C',
+                  isCompact: isCompact,
                 ),
               ],
             ),
-            const SizedBox(height: 16),
-            SizedBox(
-              height: 90,
-              child: spots.isEmpty
-                  ? Center(
-                      child: Text(
-                        'Synchronizing waveform stream...',
-                        style: TextStyle(color: colorScheme.onSurfaceVariant, fontSize: 12),
-                      ),
-                    )
-                  : LineChart(
-                      LineChartData(
-                        minX: 0,
-                        maxX: (ecgBuffer.length - 1).toDouble().clamp(1.0, 50.0),
-                        minY: -1.0,
-                        maxY: 1.8,
-                        gridData: const FlGridData(show: false),
-                        titlesData: const FlTitlesData(show: false),
-                        borderData: FlBorderData(show: false),
-                        lineBarsData: [
-                          LineChartBarData(
-                            spots: spots,
-                            isCurved: true,
-                            curveSmoothness: 0.35,
-                            color: colorScheme.primary,
-                            barWidth: 2.2,
-                            isStrokeCapRound: true,
-                            dotData: const FlDotData(show: false),
-                            belowBarData: BarAreaData(
-                              show: true,
-                              gradient: LinearGradient(
-                                begin: Alignment.topCenter,
-                                end: Alignment.bottomCenter,
-                                colors: [
-                                  colorScheme.primary.withValues(alpha: 0.22),
-                                  colorScheme.primary.withValues(alpha: 0.0),
-                                ],
+            SizedBox(height: isCompact ? 10 : 16),
+            ConstrainedBox(
+              constraints: BoxConstraints(maxHeight: isCompact ? 80 : 90),
+              child: AspectRatio(
+                aspectRatio: 2.2,
+                child: spots.isEmpty
+                    ? Center(
+                        child: Text(
+                          'Synchronizing waveform stream...',
+                          style: TextStyle(color: colorScheme.onSurfaceVariant, fontSize: 12),
+                        ),
+                      )
+                    : LineChart(
+                        LineChartData(
+                          minX: 0,
+                          maxX: (ecgBuffer.length - 1).toDouble().clamp(1.0, 50.0),
+                          minY: -1.0,
+                          maxY: 1.8,
+                          gridData: const FlGridData(show: false),
+                          titlesData: const FlTitlesData(show: false),
+                          borderData: FlBorderData(show: false),
+                          lineBarsData: [
+                            LineChartBarData(
+                              spots: spots,
+                              isCurved: true,
+                              curveSmoothness: 0.35,
+                              color: colorScheme.primary,
+                              barWidth: 2.2,
+                              isStrokeCapRound: true,
+                              dotData: const FlDotData(show: false),
+                              belowBarData: BarAreaData(
+                                show: true,
+                                gradient: LinearGradient(
+                                  begin: Alignment.topCenter,
+                                  end: Alignment.bottomCenter,
+                                  colors: [
+                                    colorScheme.primary.withValues(alpha: 0.22),
+                                    colorScheme.primary.withValues(alpha: 0.0),
+                                  ],
+                                ),
                               ),
                             ),
-                          ),
-                        ],
+                          ],
+                        ),
                       ),
-                    ),
+              ),
             ),
           ],
         ),
@@ -151,15 +159,16 @@ class EcgWaveformCard extends StatelessWidget {
 class _TelemetryTag extends StatelessWidget {
   final String label;
   final String value;
+  final bool isCompact;
 
-  const _TelemetryTag({required this.label, required this.value});
+  const _TelemetryTag({required this.label, required this.value, this.isCompact = false});
 
   @override
   Widget build(BuildContext context) {
     final colorScheme = Theme.of(context).colorScheme;
 
     return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
+      padding: EdgeInsets.symmetric(horizontal: isCompact ? 8 : 10, vertical: isCompact ? 4 : 6),
       decoration: BoxDecoration(
         color: colorScheme.surfaceContainer,
         borderRadius: BorderRadius.circular(10),
@@ -171,16 +180,16 @@ class _TelemetryTag extends StatelessWidget {
           Text(
             label,
             style: TextStyle(
-              fontSize: 10,
+              fontSize: isCompact ? 9 : 10,
               color: colorScheme.onSurfaceVariant,
               fontWeight: FontWeight.w600,
             ),
           ),
-          const SizedBox(height: 2),
+          const SizedBox(height: 1),
           Text(
             value,
             style: TextStyle(
-              fontSize: 12,
+              fontSize: isCompact ? 11 : 12,
               color: colorScheme.onSurface,
               fontWeight: FontWeight.w700,
             ),

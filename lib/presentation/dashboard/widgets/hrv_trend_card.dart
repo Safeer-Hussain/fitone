@@ -2,7 +2,9 @@ import 'package:fl_chart/fl_chart.dart';
 import 'package:flutter/material.dart';
 
 class HrvTrendCard extends StatelessWidget {
-  const HrvTrendCard({super.key});
+  final bool isCompact;
+
+  const HrvTrendCard({super.key, this.isCompact = false});
 
   @override
   Widget build(BuildContext context) {
@@ -24,7 +26,7 @@ class HrvTrendCard extends StatelessWidget {
 
     return Card(
       child: Padding(
-        padding: const EdgeInsets.all(20),
+        padding: EdgeInsets.all(isCompact ? 12 : 20),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
@@ -34,7 +36,7 @@ class HrvTrendCard extends StatelessWidget {
                 Text(
                   '7-DAY HRV TRAJECTORY',
                   style: TextStyle(
-                    fontSize: 12,
+                    fontSize: isCompact ? 10 : 12,
                     fontWeight: FontWeight.w700,
                     letterSpacing: 0.8,
                     color: colorScheme.onSurfaceVariant,
@@ -43,16 +45,16 @@ class HrvTrendCard extends StatelessWidget {
                 Text(
                   'Mean 64.4 ms',
                   style: TextStyle(
-                    fontSize: 12,
+                    fontSize: isCompact ? 10 : 12,
                     fontWeight: FontWeight.w700,
                     color: cyanAccent,
                   ),
                 ),
               ],
             ),
-            const SizedBox(height: 18),
+            SizedBox(height: isCompact ? 8 : 18),
             SizedBox(
-              height: 120,
+              height: isCompact ? 85 : 120,
               child: LineChart(
                 LineChartData(
                   minY: 45,
@@ -73,7 +75,7 @@ class HrvTrendCard extends StatelessWidget {
                     bottomTitles: AxisTitles(
                       sideTitles: SideTitles(
                         showTitles: true,
-                        reservedSize: 22,
+                        reservedSize: 20,
                         interval: 1,
                         getTitlesWidget: (value, meta) {
                           final idx = value.toInt();
@@ -99,7 +101,7 @@ class HrvTrendCard extends StatelessWidget {
                       dotData: FlDotData(
                         show: true,
                         getDotPainter: (spot, percent, barData, index) => FlDotCirclePainter(
-                          radius: 3.5,
+                          radius: isCompact ? 2.5 : 3.5,
                           color: cyanAccent,
                           strokeWidth: 1.5,
                           strokeColor: colorScheme.surface,

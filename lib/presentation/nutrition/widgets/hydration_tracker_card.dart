@@ -3,8 +3,9 @@ import '../stores/nutrition_store.dart';
 
 class HydrationTrackerCard extends StatelessWidget {
   final NutritionStore store;
+  final bool isCompact;
 
-  const HydrationTrackerCard({super.key, required this.store});
+  const HydrationTrackerCard({super.key, required this.store, this.isCompact = false});
 
   @override
   Widget build(BuildContext context) {
@@ -23,7 +24,7 @@ class HydrationTrackerCard extends StatelessWidget {
         side: BorderSide(color: colorScheme.outlineVariant),
       ),
       child: Padding(
-        padding: const EdgeInsets.all(20),
+        padding: EdgeInsets.all(isCompact ? 12 : 20),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
@@ -32,12 +33,12 @@ class HydrationTrackerCard extends StatelessWidget {
               children: [
                 Row(
                   children: [
-                    Icon(Icons.water_drop_rounded, size: 16, color: colorScheme.secondary),
-                    const SizedBox(width: 8),
+                    Icon(Icons.water_drop_rounded, size: isCompact ? 14 : 16, color: colorScheme.secondary),
+                    const SizedBox(width: 6),
                     Text(
                       'HYDRATION ENGINE',
                       style: TextStyle(
-                        fontSize: 12,
+                        fontSize: isCompact ? 10 : 12,
                         fontWeight: FontWeight.w700,
                         letterSpacing: 0.8,
                         color: colorScheme.onSurfaceVariant,
@@ -46,7 +47,7 @@ class HydrationTrackerCard extends StatelessWidget {
                   ],
                 ),
                 Container(
-                  padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
+                  padding: EdgeInsets.symmetric(horizontal: isCompact ? 6 : 8, vertical: isCompact ? 2 : 3),
                   decoration: BoxDecoration(
                     color: colorScheme.secondary.withValues(alpha: 0.15),
                     borderRadius: BorderRadius.circular(8),
@@ -56,14 +57,14 @@ class HydrationTrackerCard extends StatelessWidget {
                     '$streak Day Streak',
                     style: TextStyle(
                       color: colorScheme.secondary,
-                      fontSize: 11,
+                      fontSize: isCompact ? 9 : 11,
                       fontWeight: FontWeight.w700,
                     ),
                   ),
                 ),
               ],
             ),
-            const SizedBox(height: 16),
+            SizedBox(height: isCompact ? 8 : 16),
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
@@ -72,43 +73,53 @@ class HydrationTrackerCard extends StatelessWidget {
                   children: [
                     Text(
                       '$consumedMl ml',
-                      style: TextStyle(fontSize: 24, fontWeight: FontWeight.w800, color: colorScheme.onSurface),
+                      style: TextStyle(
+                        fontSize: isCompact ? 18 : 24,
+                        fontWeight: FontWeight.w800,
+                        color: colorScheme.onSurface,
+                      ),
                     ),
                     Text(
                       'Target $targetMl ml per day',
-                      style: TextStyle(fontSize: 12, color: colorScheme.onSurfaceVariant),
+                      style: TextStyle(fontSize: isCompact ? 10 : 12, color: colorScheme.onSurfaceVariant),
                     ),
                   ],
                 ),
                 Text(
                   '${(progress * 100).toInt()}%',
-                  style: TextStyle(fontSize: 20, fontWeight: FontWeight.w800, color: colorScheme.secondary),
+                  style: TextStyle(
+                    fontSize: isCompact ? 16 : 20,
+                    fontWeight: FontWeight.w800,
+                    color: colorScheme.secondary,
+                  ),
                 ),
               ],
             ),
-            const SizedBox(height: 12),
+            SizedBox(height: isCompact ? 8 : 12),
             ClipRRect(
               borderRadius: BorderRadius.circular(6),
               child: LinearProgressIndicator(
                 value: progress,
-                minHeight: 10,
+                minHeight: isCompact ? 6 : 10,
                 backgroundColor: colorScheme.surfaceContainerHighest,
                 valueColor: AlwaysStoppedAnimation(colorScheme.secondary),
               ),
             ),
-            const SizedBox(height: 18),
+            SizedBox(height: isCompact ? 10 : 18),
             Row(
               children: [
-                _WaterButton(label: '+250ml', onTap: () => store.logWater(250), colorScheme: colorScheme),
-                const SizedBox(width: 8),
-                _WaterButton(label: '+500ml', onTap: () => store.logWater(500), colorScheme: colorScheme),
-                const SizedBox(width: 8),
-                _WaterButton(label: '+750ml', onTap: () => store.logWater(750), colorScheme: colorScheme),
-                const SizedBox(width: 8),
+                _WaterButton(label: '+250ml', onTap: () => store.logWater(250), colorScheme: colorScheme, isCompact: isCompact),
+                const SizedBox(width: 6),
+                _WaterButton(label: '+500ml', onTap: () => store.logWater(500), colorScheme: colorScheme, isCompact: isCompact),
+                const SizedBox(width: 6),
+                _WaterButton(label: '+750ml', onTap: () => store.logWater(750), colorScheme: colorScheme, isCompact: isCompact),
+                const SizedBox(width: 6),
                 IconButton(
                   onPressed: () => store.resetHydration(),
-                  icon: Icon(Icons.refresh_rounded, size: 18, color: colorScheme.onSurfaceVariant),
+                  icon: Icon(Icons.refresh_rounded, size: isCompact ? 16 : 18, color: colorScheme.onSurfaceVariant),
                   tooltip: 'Reset Day Hydration',
+                  padding: EdgeInsets.zero,
+                  constraints: const BoxConstraints(minWidth: 28, minHeight: 28),
                 ),
               ],
             ),
@@ -123,8 +134,14 @@ class _WaterButton extends StatelessWidget {
   final String label;
   final VoidCallback onTap;
   final ColorScheme colorScheme;
+  final bool isCompact;
 
-  const _WaterButton({required this.label, required this.onTap, required this.colorScheme});
+  const _WaterButton({
+    required this.label,
+    required this.onTap,
+    required this.colorScheme,
+    this.isCompact = false,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -134,10 +151,10 @@ class _WaterButton extends StatelessWidget {
         style: OutlinedButton.styleFrom(
           foregroundColor: colorScheme.onSurface,
           side: BorderSide(color: colorScheme.outlineVariant),
-          padding: const EdgeInsets.symmetric(vertical: 8),
+          padding: EdgeInsets.symmetric(vertical: isCompact ? 4 : 8),
           shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
         ),
-        child: Text(label, style: const TextStyle(fontSize: 12, fontWeight: FontWeight.w700)),
+        child: Text(label, style: TextStyle(fontSize: isCompact ? 10 : 12, fontWeight: FontWeight.w700)),
       ),
     );
   }

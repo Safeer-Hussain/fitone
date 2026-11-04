@@ -32,7 +32,6 @@ class _DashboardViewState extends State<DashboardView> {
   Widget build(BuildContext context) {
     return Observer(
       builder: (_) {
-        // Explicitly observe themeStore so rebuild is triggered immediately on theme toggle
         final _ = _themeStore.themeMode;
         final theme = Theme.of(context);
         final colorScheme = theme.colorScheme;
@@ -44,6 +43,7 @@ class _DashboardViewState extends State<DashboardView> {
         final hrv = telemetry?.hrv ?? 64;
         final tempDelta = telemetry?.skinTempDelta ?? 0.1;
         final signal = telemetry?.signalQuality ?? 99;
+        final battery = telemetry?.batteryLevel ?? 88;
         final buffer = _store.ecgBuffer;
         final readiness = _store.readinessScore;
 
@@ -55,30 +55,31 @@ class _DashboardViewState extends State<DashboardView> {
 
               if (isLandscape) {
                 return Padding(
-                  padding: const EdgeInsets.all(16),
+                  padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
                   child: Row(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Expanded(
-                        flex: 4,
+                        flex: 35,
                         child: SingleChildScrollView(
                           physics: const ClampingScrollPhysics(),
                           child: Column(
                             children: [
-                              _buildDeviceHeader(context, connected, colorScheme),
-                              const SizedBox(height: 12),
+                              _buildDeviceHeader(context, connected, colorScheme, battery: battery, isCompact: true),
+                              const SizedBox(height: 8),
                               ReadinessRing(
                                 score: readiness,
                                 hrvMs: hrv,
                                 restingHr: hr,
+                                isCompact: true,
                               ),
                             ],
                           ),
                         ),
                       ),
-                      const SizedBox(width: 16),
+                      const SizedBox(width: 12),
                       Expanded(
-                        flex: 6,
+                        flex: 65,
                         child: SingleChildScrollView(
                           physics: const ClampingScrollPhysics(),
                           child: Column(
@@ -89,11 +90,12 @@ class _DashboardViewState extends State<DashboardView> {
                                 spo2: spo2,
                                 skinTempDelta: tempDelta,
                                 signalQuality: signal,
+                                isCompact: true,
                               ),
-                              const SizedBox(height: 12),
-                              const SleepArchitectureCard(),
-                              const SizedBox(height: 12),
-                              const HrvTrendCard(),
+                              const SizedBox(height: 8),
+                              const SleepArchitectureCard(isCompact: true),
+                              const SizedBox(height: 8),
+                              const HrvTrendCard(isCompact: true),
                             ],
                           ),
                         ),
@@ -107,7 +109,7 @@ class _DashboardViewState extends State<DashboardView> {
                 physics: const ClampingScrollPhysics(),
                 padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
                 children: [
-                  _buildDeviceHeader(context, connected, colorScheme),
+                  _buildDeviceHeader(context, connected, colorScheme, battery: battery),
                   const SizedBox(height: 14),
                   ReadinessRing(
                     score: readiness,
@@ -136,11 +138,17 @@ class _DashboardViewState extends State<DashboardView> {
     );
   }
 
-  Widget _buildDeviceHeader(BuildContext context, dynamic connected, ColorScheme colorScheme) {
+  Widget _buildDeviceHeader(
+    BuildContext context,
+    dynamic connected,
+    ColorScheme colorScheme, {
+    int battery = 88,
+    bool isCompact = false,
+  }) {
     return GestureDetector(
       onTap: () => DeviceManagerSheet.show(context, _store),
       child: Container(
-        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+        padding: EdgeInsets.symmetric(horizontal: isCompact ? 10 : 16, vertical: isCompact ? 8 : 12),
         decoration: BoxDecoration(
           color: colorScheme.surface,
           borderRadius: BorderRadius.circular(14),
@@ -149,14 +157,14 @@ class _DashboardViewState extends State<DashboardView> {
         child: Row(
           children: [
             Container(
-              width: 10,
-              height: 10,
+              width: 8,
+              height: 8,
               decoration: BoxDecoration(
                 color: colorScheme.primary,
                 shape: BoxShape.circle,
               ),
             ),
-            const SizedBox(width: 12),
+            const SizedBox(width: 8),
             Expanded(
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
@@ -165,7 +173,7 @@ class _DashboardViewState extends State<DashboardView> {
                     connected != null ? connected.name : 'AuraRing Pro v2',
                     style: TextStyle(
                       fontWeight: FontWeight.w700,
-                      fontSize: 14,
+                      fontSize: isCompact ? 12 : 14,
                       color: colorScheme.onSurface,
                     ),
                     maxLines: 1,
@@ -173,10 +181,10 @@ class _DashboardViewState extends State<DashboardView> {
                   ),
                   Text(
                     connected != null
-                        ? 'Connected via ${connected.sdk} • 99% packet fidelity'
-                        : 'Connected via SDK_A • 99% packet fidelity',
+                        ? 'Connected • 99% fidelity'
+                        : 'Connected via SDK_A • 99% fidelity',
                     style: TextStyle(
-                      fontSize: 11,
+                      fontSize: isCompact ? 10 : 11,
                       color: colorScheme.onSurfaceVariant,
                     ),
                     maxLines: 1,
@@ -185,7 +193,27 @@ class _DashboardViewState extends State<DashboardView> {
                 ],
               ),
             ),
-            Icon(Icons.tune_rounded, size: 18, color: colorScheme.primary),
+            Container(
+              padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+              decoration: BoxDecoration(
+                color: colorScheme.primary.withValues(alpha: 0.15),
+                borderRadius: BorderRadius.circular(6),
+                border: Border.all(color: colorScheme.primary.withValues(alpha: 0.3)),
+              ),
+              child: Row(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Icon(Icons.battery_charging_full_rounded, size: 12, color: colorScheme.primary),
+                  const SizedBox(width: 2),
+                  Text(
+                    '$battery%',
+                    style: TextStyle(fontSize: 10, fontWeight: FontWeight.w800, color: colorScheme.primary),
+                  ),
+                ],
+              ),
+            ),
+            const SizedBox(width: 6),
+            Icon(Icons.tune_rounded, size: 16, color: colorScheme.primary),
           ],
         ),
       ),

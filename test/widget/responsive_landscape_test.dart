@@ -21,6 +21,16 @@ void main() {
         icon: Icons.restaurant_menu_outlined,
         selectedIcon: Icons.restaurant_menu_rounded,
       ),
+      AdaptiveScaffoldDestination(
+        label: 'GPS Run',
+        icon: Icons.directions_run_outlined,
+        selectedIcon: Icons.directions_run_rounded,
+      ),
+      AdaptiveScaffoldDestination(
+        label: 'Athletes',
+        icon: Icons.groups_outlined,
+        selectedIcon: Icons.groups_rounded,
+      ),
     ];
 
     testWidgets('Portrait mode displays BottomNavigationBar and hides NavigationRail', (tester) async {
@@ -61,14 +71,14 @@ void main() {
             body: const Row(
               children: [
                 Expanded(
-                  flex: 4,
+                  flex: 35,
                   child: SingleChildScrollView(
-                    child: ReadinessRing(score: 88, hrvMs: 65, restingHr: 54),
+                    child: ReadinessRing(score: 88, hrvMs: 65, restingHr: 54, isCompact: true),
                   ),
                 ),
                 VerticalDivider(),
                 Expanded(
-                  flex: 6,
+                  flex: 65,
                   child: Center(child: Text('Landscape Master Detail Pane')),
                 ),
               ],
@@ -81,6 +91,74 @@ void main() {
       expect(find.byType(NavigationBar), findsNothing);
       expect(find.text('Landscape Master Detail Pane'), findsOneWidget);
       expect(find.text('RECOVERY & READINESS'), findsOneWidget);
+      expect(tester.takeException(), isNull);
+    });
+
+    testWidgets('Ultra-short landscape viewport (800x360) renders without RenderFlex overflow', (tester) async {
+      tester.view.physicalSize = const Size(800, 360);
+      tester.view.devicePixelRatio = 1.0;
+      addTearDown(tester.view.resetPhysicalSize);
+      addTearDown(tester.view.resetDevicePixelRatio);
+
+      await tester.pumpWidget(
+        MaterialApp(
+          home: AdaptiveScaffold(
+            currentIndex: 0,
+            destinations: destinations,
+            appBar: AppBar(
+              title: const Text('FITONE ECOSYSTEM'),
+              actions: [
+                IconButton(
+                  onPressed: () {},
+                  icon: const Icon(Icons.settings_outlined),
+                ),
+              ],
+            ),
+            onNavigationIndexChanged: (_) {},
+            body: Row(
+              children: [
+                const Expanded(
+                  flex: 35,
+                  child: SingleChildScrollView(
+                    physics: ClampingScrollPhysics(),
+                    child: Column(
+                      children: [
+                        ReadinessRing(score: 95, hrvMs: 78, restingHr: 50, isCompact: true),
+                      ],
+                    ),
+                  ),
+                ),
+                const VerticalDivider(width: 1),
+                Expanded(
+                  flex: 65,
+                  child: SingleChildScrollView(
+                    physics: const ClampingScrollPhysics(),
+                    child: Column(
+                      children: List.generate(
+                        6,
+                        (index) => Container(
+                          height: 80,
+                          margin: const EdgeInsets.only(bottom: 8),
+                          color: Colors.blueGrey,
+                          child: Center(child: Text('Card $index')),
+                        ),
+                      ),
+                    ),
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ),
+      );
+
+      await tester.pumpAndSettle();
+
+      expect(find.byType(NavigationRail), findsOneWidget);
+      expect(find.byType(NavigationBar), findsNothing);
+      expect(find.text('FITONE ECOSYSTEM'), findsOneWidget);
+      expect(find.text('RECOVERY & READINESS'), findsOneWidget);
+      expect(find.text('Card 0'), findsOneWidget);
       expect(tester.takeException(), isNull);
     });
   });

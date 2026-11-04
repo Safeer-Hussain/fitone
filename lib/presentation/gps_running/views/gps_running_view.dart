@@ -102,14 +102,14 @@ class _GpsRunningViewState extends State<GpsRunningView> {
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
               if (isTracking) ...[
-                FloatingActionButton(
+                FloatingActionButton.small(
                   heroTag: 'pause_btn',
                   onPressed: isPaused ? () => _store.resumeRun() : () => _store.pauseRun(),
                   backgroundColor: colorScheme.surface,
                   foregroundColor: colorScheme.primary,
                   child: Icon(isPaused ? Icons.play_arrow_rounded : Icons.pause_rounded),
                 ),
-                const SizedBox(width: 20),
+                const SizedBox(width: 16),
                 FloatingActionButton.extended(
                   heroTag: 'stop_btn',
                   onPressed: () async {
@@ -120,8 +120,8 @@ class _GpsRunningViewState extends State<GpsRunningView> {
                   },
                   backgroundColor: colorScheme.error,
                   foregroundColor: colorScheme.onError,
-                  icon: const Icon(Icons.stop_rounded),
-                  label: const Text('Finish Run', style: TextStyle(fontWeight: FontWeight.w700)),
+                  icon: const Icon(Icons.stop_rounded, size: 18),
+                  label: const Text('Finish Run', style: TextStyle(fontWeight: FontWeight.w700, fontSize: 13)),
                 ),
               ] else ...[
                 FloatingActionButton.extended(
@@ -131,8 +131,8 @@ class _GpsRunningViewState extends State<GpsRunningView> {
                   },
                   backgroundColor: colorScheme.primary,
                   foregroundColor: colorScheme.onPrimary,
-                  icon: const Icon(Icons.directions_run_rounded),
-                  label: const Text('Start GPS Run', style: TextStyle(fontWeight: FontWeight.w700)),
+                  icon: const Icon(Icons.directions_run_rounded, size: 18),
+                  label: const Text('Start GPS Run', style: TextStyle(fontWeight: FontWeight.w700, fontSize: 13)),
                 ),
               ],
             ],
@@ -141,11 +141,15 @@ class _GpsRunningViewState extends State<GpsRunningView> {
 
         return Scaffold(
           appBar: AppBar(
-            title: const Text('GPS Route Tracker'),
+            toolbarHeight: isLandscape ? 36 : null,
+            title: Text(
+              'GPS Route Tracker',
+              style: TextStyle(fontSize: isLandscape ? 13 : 16, fontWeight: FontWeight.w700),
+            ),
             actions: [
               IconButton(
                 onPressed: () => _showHistorySheet(context, colorScheme),
-                icon: Icon(Icons.history_rounded, color: colorScheme.primary),
+                icon: Icon(Icons.history_rounded, color: colorScheme.primary, size: isLandscape ? 18 : 22),
                 tooltip: 'Run History',
               ),
             ],
@@ -154,25 +158,27 @@ class _GpsRunningViewState extends State<GpsRunningView> {
               ? SafeArea(
                   child: Row(
                     children: [
+                      // Left Pane (60% width): Interactive map canvas filling the height cleanly
                       Expanded(
-                        flex: 6,
+                        flex: 60,
                         child: Stack(
                           children: [
                             buildMapWidget(),
                             if (!isTracking)
                               Positioned(
-                                top: 16,
-                                left: 16,
+                                top: 10,
+                                left: 10,
                                 child: ElevatedButton.icon(
                                   onPressed: () {
                                     _store.startSimulatedRun();
                                     _mapController.move(_initialLahoreCenter, 15.0);
                                   },
-                                  icon: const Icon(Icons.play_circle_filled_rounded, size: 18),
-                                  label: const Text('Simulate Run (Lahore)'),
+                                  icon: const Icon(Icons.play_circle_filled_rounded, size: 16),
+                                  label: const Text('Simulate Run (Lahore)', style: TextStyle(fontSize: 12)),
                                   style: ElevatedButton.styleFrom(
                                     backgroundColor: colorScheme.primary,
                                     foregroundColor: colorScheme.onPrimary,
+                                    padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
                                   ),
                                 ),
                               ),
@@ -180,17 +186,18 @@ class _GpsRunningViewState extends State<GpsRunningView> {
                         ),
                       ),
                       VerticalDivider(color: colorScheme.outlineVariant, width: 1),
+                      // Right Pane (40% width): Floating HUD card containing live pace, elapsed time, distance, and HR zone
                       Expanded(
-                        flex: 4,
+                        flex: 40,
                         child: Container(
                           color: colorScheme.surface,
-                          padding: const EdgeInsets.all(16),
+                          padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 8),
                           child: SingleChildScrollView(
                             physics: const ClampingScrollPhysics(),
                             child: Column(
                               children: [
-                                RunningMetricsOverlay(store: _store),
-                                const SizedBox(height: 16),
+                                RunningMetricsOverlay(store: _store, isCompact: true),
+                                const SizedBox(height: 10),
                                 buildControls(),
                               ],
                             ),

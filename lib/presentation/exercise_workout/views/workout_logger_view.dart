@@ -79,13 +79,13 @@ class _WorkoutLoggerViewState extends State<WorkoutLoggerView> {
                         flex: 5,
                         child: SingleChildScrollView(
                           physics: const ClampingScrollPhysics(),
-                          padding: const EdgeInsets.all(16),
+                          padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
                           child: Column(
                             children: [
                               _buildSummaryCard(session, colorScheme),
-                              const SizedBox(height: 12),
+                              const SizedBox(height: 8),
                               _buildInputCard(currentExercise, exercises, unit, colorScheme),
-                              const SizedBox(height: 12),
+                              const SizedBox(height: 8),
                               _buildBottomBar(context, isRestRunning, restRemaining, colorScheme),
                             ],
                           ),
