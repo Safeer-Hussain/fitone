@@ -30,124 +30,145 @@ class EcgWaveformCard extends StatelessWidget {
       (index) => FlSpot(index.toDouble(), ecgBuffer[index]),
     );
 
-    return Card(
-      child: Padding(
-        padding: EdgeInsets.all(isCompact ? 12 : 20),
+    final maxX = ecgBuffer.length > 1 ? (ecgBuffer.length - 1).toDouble() : 1.0;
+
+    return SizedBox(
+      width: double.infinity,
+      child: Card(
+        margin: EdgeInsets.zero,
+        clipBehavior: Clip.antiAlias,
         child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
+          crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                Row(
-                  children: [
-                    Container(
-                      width: 8,
-                      height: 8,
-                      decoration: BoxDecoration(
-                        color: colorScheme.primary,
-                        shape: BoxShape.circle,
-                      ),
-                    ),
-                    const SizedBox(width: 8),
-                    Text(
-                      'LIVE PPG TELEMETRY',
-                      style: TextStyle(
-                        fontSize: isCompact ? 10 : 12,
-                        fontWeight: FontWeight.w700,
-                        letterSpacing: 0.8,
-                        color: colorScheme.onSurfaceVariant,
-                      ),
-                    ),
-                  ],
-                ),
-                Text(
-                  'Signal $signalQuality%',
-                  style: TextStyle(
-                    fontSize: isCompact ? 10 : 11,
-                    fontWeight: FontWeight.w600,
-                    color: colorScheme.primary,
-                  ),
-                ),
-              ],
-            ),
-            SizedBox(height: isCompact ? 8 : 16),
-            Row(
-              crossAxisAlignment: CrossAxisAlignment.end,
-              children: [
-                Text(
-                  '$heartRate',
-                  style: isCompact
-                      ? TextStyle(fontSize: 26, fontWeight: FontWeight.w800, color: colorScheme.onSurface)
-                      : AppTypography.metricLarge.copyWith(color: colorScheme.onSurface),
-                ),
-                Padding(
-                  padding: EdgeInsets.only(bottom: isCompact ? 4.0 : 8.0, left: 6),
-                  child: Text(
-                    'BPM',
-                    style: TextStyle(
-                      fontSize: isCompact ? 11 : 13,
-                      fontWeight: FontWeight.w700,
-                      color: colorScheme.onSurfaceVariant,
-                    ),
-                  ),
-                ),
-                const Spacer(),
-                _TelemetryTag(label: 'SpO2', value: '$spo2%', isCompact: isCompact),
-                const SizedBox(width: 8),
-                _TelemetryTag(
-                  label: 'Skin Temp',
-                  value: '${skinTempDelta >= 0 ? "+" : ""}${skinTempDelta.toStringAsFixed(1)}C',
-                  isCompact: isCompact,
-                ),
-              ],
-            ),
-            SizedBox(height: isCompact ? 10 : 16),
-            ConstrainedBox(
-              constraints: BoxConstraints(maxHeight: isCompact ? 80 : 90),
-              child: AspectRatio(
-                aspectRatio: 2.2,
-                child: spots.isEmpty
-                    ? Center(
-                        child: Text(
-                          'Synchronizing waveform stream...',
-                          style: TextStyle(color: colorScheme.onSurfaceVariant, fontSize: 12),
-                        ),
-                      )
-                    : LineChart(
-                        LineChartData(
-                          minX: 0,
-                          maxX: (ecgBuffer.length - 1).toDouble().clamp(1.0, 50.0),
-                          minY: -1.0,
-                          maxY: 1.8,
-                          gridData: const FlGridData(show: false),
-                          titlesData: const FlTitlesData(show: false),
-                          borderData: FlBorderData(show: false),
-                          lineBarsData: [
-                            LineChartBarData(
-                              spots: spots,
-                              isCurved: true,
-                              curveSmoothness: 0.35,
+            Padding(
+              padding: EdgeInsets.fromLTRB(
+                isCompact ? 12 : 16,
+                isCompact ? 10 : 16,
+                isCompact ? 12 : 16,
+                isCompact ? 6 : 10,
+              ),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.stretch,
+                children: [
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      Row(
+                        children: [
+                          Container(
+                            width: 8,
+                            height: 8,
+                            decoration: BoxDecoration(
                               color: colorScheme.primary,
-                              barWidth: 2.2,
-                              isStrokeCapRound: true,
-                              dotData: const FlDotData(show: false),
-                              belowBarData: BarAreaData(
-                                show: true,
-                                gradient: LinearGradient(
-                                  begin: Alignment.topCenter,
-                                  end: Alignment.bottomCenter,
-                                  colors: [
-                                    colorScheme.primary.withValues(alpha: 0.22),
-                                    colorScheme.primary.withValues(alpha: 0.0),
-                                  ],
-                                ),
+                              shape: BoxShape.circle,
+                            ),
+                          ),
+                          const SizedBox(width: 8),
+                          Text(
+                            'LIVE PPG TELEMETRY',
+                            style: TextStyle(
+                              fontSize: isCompact ? 10 : 12,
+                              fontWeight: FontWeight.w700,
+                              letterSpacing: 0.8,
+                              color: colorScheme.onSurfaceVariant,
+                            ),
+                          ),
+                        ],
+                      ),
+                      Text(
+                        'Signal $signalQuality%',
+                        style: TextStyle(
+                          fontSize: isCompact ? 10 : 11,
+                          fontWeight: FontWeight.w600,
+                          color: colorScheme.primary,
+                        ),
+                      ),
+                    ],
+                  ),
+                  SizedBox(height: isCompact ? 6 : 12),
+                  Row(
+                    crossAxisAlignment: CrossAxisAlignment.end,
+                    children: [
+                      Text(
+                        '$heartRate',
+                        style: isCompact
+                            ? TextStyle(fontSize: 26, fontWeight: FontWeight.w800, color: colorScheme.onSurface)
+                            : AppTypography.metricLarge.copyWith(color: colorScheme.onSurface),
+                      ),
+                      Padding(
+                        padding: EdgeInsets.only(bottom: isCompact ? 4.0 : 8.0, left: 6),
+                        child: Text(
+                          'BPM',
+                          style: TextStyle(
+                            fontSize: isCompact ? 11 : 13,
+                            fontWeight: FontWeight.w700,
+                            color: colorScheme.onSurfaceVariant,
+                          ),
+                        ),
+                      ),
+                      const Spacer(),
+                      _TelemetryTag(label: 'SpO2', value: '$spo2%', isCompact: isCompact),
+                      const SizedBox(width: 8),
+                      _TelemetryTag(
+                        label: 'Skin Temp',
+                        value: '${skinTempDelta >= 0 ? "+" : ""}${skinTempDelta.toStringAsFixed(1)}C',
+                        isCompact: isCompact,
+                      ),
+                    ],
+                  ),
+                ],
+              ),
+            ),
+            SizedBox(
+              width: double.infinity,
+              height: isCompact ? 75 : 95,
+              child: spots.isEmpty
+                  ? Center(
+                      child: Text(
+                        'Synchronizing waveform stream...',
+                        style: TextStyle(color: colorScheme.onSurfaceVariant, fontSize: 12),
+                      ),
+                    )
+                  : LineChart(
+                      LineChartData(
+                        minX: 0,
+                        maxX: maxX,
+                        minY: -1.0,
+                        maxY: 1.8,
+                        clipData: const FlClipData.all(),
+                        gridData: const FlGridData(show: false),
+                        borderData: FlBorderData(show: false),
+                        titlesData: const FlTitlesData(
+                          show: false,
+                          leftTitles: AxisTitles(sideTitles: SideTitles(showTitles: false, reservedSize: 0)),
+                          rightTitles: AxisTitles(sideTitles: SideTitles(showTitles: false, reservedSize: 0)),
+                          topTitles: AxisTitles(sideTitles: SideTitles(showTitles: false, reservedSize: 0)),
+                          bottomTitles: AxisTitles(sideTitles: SideTitles(showTitles: false, reservedSize: 0)),
+                        ),
+                        lineBarsData: [
+                          LineChartBarData(
+                            spots: spots,
+                            isCurved: true,
+                            curveSmoothness: 0.35,
+                            color: colorScheme.primary,
+                            barWidth: 2.2,
+                            isStrokeCapRound: true,
+                            dotData: const FlDotData(show: false),
+                            belowBarData: BarAreaData(
+                              show: true,
+                              gradient: LinearGradient(
+                                begin: Alignment.topCenter,
+                                end: Alignment.bottomCenter,
+                                colors: [
+                                  colorScheme.primary.withValues(alpha: 0.25),
+                                  colorScheme.primary.withValues(alpha: 0.0),
+                                ],
                               ),
                             ),
-                          ],
-                        ),
+                          ),
+                        ],
                       ),
-              ),
+                    ),
             ),
           ],
         ),

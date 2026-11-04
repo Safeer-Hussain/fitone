@@ -249,15 +249,16 @@ class _ExerciseEncyclopediaViewState extends State<ExerciseEncyclopediaView> {
                         padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
                         gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
                           crossAxisCount: 2,
-                          childAspectRatio: 2.5,
                           crossAxisSpacing: 8,
                           mainAxisSpacing: 8,
+                          mainAxisExtent: 135,
                         ),
                         itemCount: exercises.length,
                         itemBuilder: (context, index) {
                           final ex = exercises[index];
                           return ExerciseCard(
                             exercise: ex,
+                            isCompact: true,
                             onTap: () {
                               Navigator.of(context).push(
                                 MaterialPageRoute(builder: (_) => ExerciseDetailView(exercise: ex)),

@@ -1,5 +1,7 @@
 import 'package:fitone/core/widgets/adaptive_scaffold.dart';
+import 'package:fitone/domain/entities/exercise.dart';
 import 'package:fitone/presentation/dashboard/widgets/readiness_ring.dart';
+import 'package:fitone/presentation/exercise_workout/widgets/exercise_card.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 
@@ -159,6 +161,85 @@ void main() {
       expect(find.text('FITONE ECOSYSTEM'), findsOneWidget);
       expect(find.text('RECOVERY & READINESS'), findsOneWidget);
       expect(find.text('Card 0'), findsOneWidget);
+      expect(tester.takeException(), isNull);
+    });
+
+    testWidgets('Exercise card grid renders with zero RenderFlex overflow on an 800x360 landscape viewport', (tester) async {
+      tester.view.physicalSize = const Size(800, 360);
+      tester.view.devicePixelRatio = 1.0;
+      addTearDown(tester.view.resetPhysicalSize);
+      addTearDown(tester.view.resetDevicePixelRatio);
+
+      final exercises = [
+        const Exercise(
+          id: 'ex_1',
+          name: 'Barbell Incline Bench Press',
+          bodyPart: 'Chest',
+          equipment: 'Barbell',
+          targetMuscles: 'Upper Pectoralis, Anterior Deltoid',
+          instructions: 'Lower bar to clavicle under tension.',
+          difficulty: 'Intermediate',
+        ),
+        const Exercise(
+          id: 'ex_2',
+          name: 'Romanian Deadlift',
+          bodyPart: 'Legs',
+          equipment: 'Barbell',
+          targetMuscles: 'Hamstrings, Gluteus Maximus',
+          instructions: 'Hinge hips backwards while maintaining neutral spine.',
+          difficulty: 'Advanced',
+        ),
+        const Exercise(
+          id: 'ex_3',
+          name: 'Seated Cable Row',
+          bodyPart: 'Back',
+          equipment: 'Machine',
+          targetMuscles: 'Latissimus Dorsi, Rhomboids',
+          instructions: 'Retract scapulae and pull to lower sternum.',
+          difficulty: 'Beginner',
+        ),
+        const Exercise(
+          id: 'ex_4',
+          name: 'Dumbbell Lateral Raise',
+          bodyPart: 'Shoulders',
+          equipment: 'Dumbbell',
+          targetMuscles: 'Lateral Deltoid',
+          instructions: 'Raise dumbbells in scapular plane.',
+          difficulty: 'Beginner',
+        ),
+      ];
+
+      await tester.pumpWidget(
+        MaterialApp(
+          home: Scaffold(
+            body: GridView.builder(
+              padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 8),
+              gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+                crossAxisCount: 2,
+                crossAxisSpacing: 8,
+                mainAxisSpacing: 8,
+                mainAxisExtent: 135,
+              ),
+              itemCount: exercises.length,
+              itemBuilder: (context, index) {
+                return ExerciseCard(
+                  exercise: exercises[index],
+                  isCompact: true,
+                  onTap: () {},
+                );
+              },
+            ),
+          ),
+        ),
+      );
+
+      await tester.pumpAndSettle();
+
+      expect(find.byType(ExerciseCard), findsNWidgets(4));
+      expect(find.text('Barbell Incline Bench Press'), findsOneWidget);
+      expect(find.text('Romanian Deadlift'), findsOneWidget);
+      expect(find.text('Seated Cable Row'), findsOneWidget);
+      expect(find.text('Dumbbell Lateral Raise'), findsOneWidget);
       expect(tester.takeException(), isNull);
     });
   });

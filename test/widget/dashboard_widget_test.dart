@@ -1,6 +1,8 @@
 import 'package:fitone/domain/entities/nutrition_day.dart';
+import 'package:fitone/presentation/dashboard/widgets/ecg_waveform_card.dart';
 import 'package:fitone/presentation/dashboard/widgets/readiness_ring.dart';
 import 'package:fitone/presentation/nutrition/widgets/macro_progress_ring.dart';
+import 'package:fl_chart/fl_chart.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 
@@ -62,6 +64,43 @@ void main() {
       expect(find.text('600'), findsOneWidget);
       expect(find.text('1800 kcal left'), findsOneWidget);
       expect(find.text('Protein'), findsOneWidget);
+    });
+
+    testWidgets('EcgWaveformCard renders with full container width and valid telemetry', (WidgetTester tester) async {
+      const containerWidth = 450.0;
+      final samples = List.generate(40, (i) => (i % 5 == 0) ? 1.2 : 0.0);
+
+      await tester.pumpWidget(
+        MaterialApp(
+          home: Scaffold(
+            body: SizedBox(
+              width: containerWidth,
+              child: EcgWaveformCard(
+                ecgBuffer: samples,
+                heartRate: 74,
+                spo2: 98,
+                skinTempDelta: 0.2,
+                signalQuality: 99,
+              ),
+            ),
+          ),
+        ),
+      );
+
+      final cardFinder = find.byType(EcgWaveformCard);
+      expect(cardFinder, findsOneWidget);
+      final cardSize = tester.getSize(cardFinder);
+      expect(cardSize.width, equals(containerWidth));
+
+      final chartFinder = find.byType(LineChart);
+      expect(chartFinder, findsOneWidget);
+      final chartSize = tester.getSize(chartFinder);
+      expect(chartSize.width, equals(containerWidth));
+
+      expect(find.text('LIVE PPG TELEMETRY'), findsOneWidget);
+      expect(find.text('74'), findsOneWidget);
+      expect(find.text('98%'), findsOneWidget);
+      expect(tester.takeException(), isNull);
     });
   });
 }

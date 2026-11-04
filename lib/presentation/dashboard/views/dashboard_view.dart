@@ -64,6 +64,7 @@ class _DashboardViewState extends State<DashboardView> {
                         child: SingleChildScrollView(
                           physics: const ClampingScrollPhysics(),
                           child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.stretch,
                             children: [
                               _buildDeviceHeader(context, connected, colorScheme, battery: battery, isCompact: true),
                               const SizedBox(height: 8),
@@ -83,6 +84,7 @@ class _DashboardViewState extends State<DashboardView> {
                         child: SingleChildScrollView(
                           physics: const ClampingScrollPhysics(),
                           child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.stretch,
                             children: [
                               EcgWaveformCard(
                                 ecgBuffer: buffer,
