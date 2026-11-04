@@ -66,5 +66,13 @@
 		<string>UIInterfaceOrientationLandscapeLeft</string>
 		<string>UIInterfaceOrientationLandscapeRight</string>
 	</array>
+	<key>NSLocationWhenInUseUsageDescription</key>
+	<string>Fitone tracks your outdoor running routes, pace, and elevation splits accurately.</string>
+	<key>NSLocationAlwaysAndWhenInUseUsageDescription</key>
+	<string>Fitone requires continuous location telemetry to map outdoor workouts.</string>
+	<key>NSBluetoothAlwaysUsageDescription</key>
+	<string>Fitone communicates with AuraRing and KinetixRing to stream real-time biometric telemetry.</string>
+	<key>NSBluetoothPeripheralUsageDescription</key>
+	<string>Fitone uses Bluetooth Low Energy to connect to smart wearable rings.</string>
 </dict>
 </plist>
