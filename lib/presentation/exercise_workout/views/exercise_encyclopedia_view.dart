@@ -246,6 +246,7 @@ class _ExerciseEncyclopediaViewState extends State<ExerciseEncyclopediaView> {
                       }
 
                       return GridView.builder(
+                        keyboardDismissBehavior: ScrollViewKeyboardDismissBehavior.onDrag,
                         padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
                         gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
                           crossAxisCount: 2,
@@ -381,6 +382,7 @@ class _ExerciseEncyclopediaViewState extends State<ExerciseEncyclopediaView> {
               }
 
               return ListView.builder(
+                keyboardDismissBehavior: ScrollViewKeyboardDismissBehavior.onDrag,
                 padding: const EdgeInsets.all(16),
                 itemCount: exercises.length,
                 itemBuilder: (context, index) {

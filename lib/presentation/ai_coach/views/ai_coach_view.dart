@@ -62,6 +62,7 @@ class _AiCoachViewState extends State<AiCoachView> {
               return ListView.builder(
                 controller: _scrollController,
                 physics: const ClampingScrollPhysics(),
+                keyboardDismissBehavior: ScrollViewKeyboardDismissBehavior.onDrag,
                 padding: EdgeInsets.all(isLandscape ? 10 : 16),
                 itemCount: messages.length,
                 itemBuilder: (context, index) {

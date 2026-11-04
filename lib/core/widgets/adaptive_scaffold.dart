@@ -78,54 +78,64 @@ class AdaptiveScaffold extends StatelessWidget {
         return LayoutBuilder(
           builder: (context, constraints) {
             final isLandscape = orientation == Orientation.landscape || constraints.maxWidth > 720;
+            final safeBody = GestureDetector(
+              onTap: () => FocusManager.instance.primaryFocus?.unfocus(),
+              behavior: HitTestBehavior.translucent,
+              child: body,
+            );
 
             if (isLandscape) {
               return Scaffold(
                 appBar: _buildLandscapeAppBar(context, appBar),
                 endDrawer: endDrawer,
                 floatingActionButton: floatingActionButton,
-                body: Column(
-                  children: [
-                    const OfflineBanner(),
-                    Expanded(
-                      child: Row(
-                        children: [
-                          SizedBox(
-                            width: 56,
-                            child: LayoutBuilder(
-                              builder: (context, railConstraints) {
-                                return SingleChildScrollView(
-                                  physics: const ClampingScrollPhysics(),
-                                  child: ConstrainedBox(
-                                    constraints: BoxConstraints(minHeight: railConstraints.maxHeight),
-                                    child: IntrinsicHeight(
-                                      child: NavigationRail(
-                                        minWidth: 56,
-                                        selectedIndex: currentIndex,
-                                        onDestinationSelected: onNavigationIndexChanged,
-                                        labelType: NavigationRailLabelType.none,
-                                        backgroundColor: colorScheme.surface,
-                                        indicatorColor: colorScheme.primary.withValues(alpha: 0.18),
-                                        destinations: destinations.map((d) {
-                                          return NavigationRailDestination(
-                                            icon: Icon(d.icon, size: 22),
-                                            selectedIcon: Icon(d.selectedIcon, size: 22, color: colorScheme.primary),
-                                            label: Text(d.label),
-                                          );
-                                        }).toList(),
+                body: GestureDetector(
+                  onTap: () => FocusManager.instance.primaryFocus?.unfocus(),
+                  behavior: HitTestBehavior.translucent,
+                  child: Column(
+                    children: [
+                      const OfflineBanner(),
+                      Expanded(
+                        child: Row(
+                          children: [
+                            SizedBox(
+                              width: 56,
+                              child: LayoutBuilder(
+                                builder: (context, railConstraints) {
+                                  return SingleChildScrollView(
+                                    physics: const ClampingScrollPhysics(),
+                                    keyboardDismissBehavior: ScrollViewKeyboardDismissBehavior.onDrag,
+                                    child: ConstrainedBox(
+                                      constraints: BoxConstraints(minHeight: railConstraints.maxHeight),
+                                      child: IntrinsicHeight(
+                                        child: NavigationRail(
+                                          minWidth: 56,
+                                          selectedIndex: currentIndex,
+                                          onDestinationSelected: onNavigationIndexChanged,
+                                          labelType: NavigationRailLabelType.none,
+                                          backgroundColor: colorScheme.surface,
+                                          indicatorColor: colorScheme.primary.withValues(alpha: 0.18),
+                                          destinations: destinations.map((d) {
+                                            return NavigationRailDestination(
+                                              icon: Icon(d.icon, size: 22),
+                                              selectedIcon: Icon(d.selectedIcon, size: 22, color: colorScheme.primary),
+                                              label: Text(d.label),
+                                            );
+                                          }).toList(),
+                                        ),
                                       ),
                                     ),
-                                  ),
-                                );
-                              },
+                                  );
+                                },
+                              ),
                             ),
-                          ),
-                          VerticalDivider(width: 1, thickness: 1, color: colorScheme.outlineVariant),
-                          Expanded(child: body),
-                        ],
+                            VerticalDivider(width: 1, thickness: 1, color: colorScheme.outlineVariant),
+                            Expanded(child: safeBody),
+                          ],
+                        ),
                       ),
-                    ),
-                  ],
+                    ],
+                  ),
                 ),
               );
             }
@@ -134,11 +144,15 @@ class AdaptiveScaffold extends StatelessWidget {
               appBar: appBar,
               endDrawer: endDrawer,
               floatingActionButton: floatingActionButton,
-              body: Column(
-                children: [
-                  const OfflineBanner(),
-                  Expanded(child: body),
-                ],
+              body: GestureDetector(
+                onTap: () => FocusManager.instance.primaryFocus?.unfocus(),
+                behavior: HitTestBehavior.translucent,
+                child: Column(
+                  children: [
+                    const OfflineBanner(),
+                    Expanded(child: safeBody),
+                  ],
+                ),
               ),
               bottomNavigationBar: NavigationBar(
                 selectedIndex: currentIndex,

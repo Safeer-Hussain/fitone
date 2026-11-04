@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_mobx/flutter_mobx.dart';
 import '../database/app_database.dart';
 import '../network/network_monitor.dart';
+import '../utils/app_feedback.dart';
 
 class DeveloperDebugDrawer extends StatelessWidget {
   const DeveloperDebugDrawer({super.key});
@@ -181,6 +182,33 @@ class DeveloperDebugDrawer extends StatelessWidget {
                   ),
                   const SizedBox(height: 24),
                   Text(
+                    'BLE HARDWARE SIMULATION',
+                    style: TextStyle(
+                      color: colorScheme.primary,
+                      fontSize: 11,
+                      fontWeight: FontWeight.w800,
+                      letterSpacing: 1.0,
+                    ),
+                  ),
+                  const SizedBox(height: 12),
+                  OutlinedButton.icon(
+                    key: const ValueKey('simulate_ble_timeout_button'),
+                    onPressed: () {
+                      Navigator.of(context).pop();
+                      AppFeedback.showError(
+                        context,
+                        'BLE channel timeout: Check device battery.',
+                      );
+                    },
+                    icon: Icon(Icons.error_outline_rounded, size: 16, color: colorScheme.error),
+                    label: const Text('Simulate BLE Diagnostic Timeout'),
+                    style: OutlinedButton.styleFrom(
+                      foregroundColor: colorScheme.error,
+                      side: BorderSide(color: colorScheme.error.withValues(alpha: 0.5)),
+                    ),
+                  ),
+                  const SizedBox(height: 24),
+                  Text(
                     'DATABASE OPERATIONS',
                     style: TextStyle(
                       color: colorScheme.primary,
@@ -197,11 +225,9 @@ class DeveloperDebugDrawer extends StatelessWidget {
                       await db.delete('workout_sets');
                       await db.delete('running_routes');
                       if (context.mounted) {
-                        ScaffoldMessenger.of(context).showSnackBar(
-                          SnackBar(
-                            content: const Text('Transient logs cleared. Seed tables retained.'),
-                            backgroundColor: colorScheme.surfaceContainerHighest,
-                          ),
+                        AppFeedback.showInfo(
+                          context,
+                          'Transient logs cleared. Seed tables retained.',
                         );
                       }
                     },

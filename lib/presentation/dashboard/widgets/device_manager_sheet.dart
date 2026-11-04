@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_mobx/flutter_mobx.dart';
 import '../../../core/constants/app_assets.dart';
+import '../../../core/utils/app_feedback.dart';
 import '../stores/dashboard_store.dart';
 
 class DeviceManagerSheet extends StatelessWidget {
@@ -22,21 +23,24 @@ class DeviceManagerSheet extends StatelessWidget {
     final theme = Theme.of(context);
     final colorScheme = theme.colorScheme;
 
-    return Padding(
-      padding: EdgeInsets.only(bottom: MediaQuery.of(context).viewInsets.bottom),
-      child: SafeArea(
-        child: Container(
-          constraints: BoxConstraints(
-            maxHeight: MediaQuery.of(context).size.height * 0.88,
-          ),
-          decoration: BoxDecoration(
-            color: theme.scaffoldBackgroundColor,
-            borderRadius: const BorderRadius.vertical(top: Radius.circular(24)),
-            border: Border(top: BorderSide(color: colorScheme.outlineVariant)),
-          ),
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
+    return GestureDetector(
+      onTap: () => FocusManager.instance.primaryFocus?.unfocus(),
+      behavior: HitTestBehavior.translucent,
+      child: Padding(
+        padding: EdgeInsets.only(bottom: MediaQuery.of(context).viewInsets.bottom),
+        child: SafeArea(
+          child: Container(
+            constraints: BoxConstraints(
+              maxHeight: MediaQuery.of(context).size.height * 0.88,
+            ),
+            decoration: BoxDecoration(
+              color: theme.scaffoldBackgroundColor,
+              borderRadius: const BorderRadius.vertical(top: Radius.circular(24)),
+              border: Border(top: BorderSide(color: colorScheme.outlineVariant)),
+            ),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
               Container(
                 margin: const EdgeInsets.only(top: 12, bottom: 8),
                 width: 44,
@@ -89,6 +93,7 @@ class DeviceManagerSheet extends StatelessWidget {
               Flexible(
                 child: SingleChildScrollView(
                   physics: const ClampingScrollPhysics(),
+                  keyboardDismissBehavior: ScrollViewKeyboardDismissBehavior.onDrag,
                   padding: const EdgeInsets.all(20),
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
@@ -210,8 +215,20 @@ class DeviceManagerSheet extends StatelessWidget {
                                     const SizedBox(width: 8),
                                     ElevatedButton(
                                       onPressed: isConnected
-                                          ? () => store.disconnectDevice()
-                                          : () => store.connectDevice(device.id, device.sdk),
+                                          ? () {
+                                              store.disconnectDevice();
+                                              AppFeedback.showWarning(
+                                                context,
+                                                'Smart-Ring disconnected. Switched to offline telemetry.',
+                                              );
+                                            }
+                                          : () {
+                                              store.connectDevice(device.id, device.sdk);
+                                              AppFeedback.showSuccess(
+                                                context,
+                                                '${device.name} paired successfully.',
+                                              );
+                                            },
                                       style: ElevatedButton.styleFrom(
                                         backgroundColor: isConnected ? colorScheme.surfaceContainer : colorScheme.primary,
                                         foregroundColor: isConnected ? colorScheme.onSurface : colorScheme.onPrimary,
@@ -366,8 +383,9 @@ class DeviceManagerSheet extends StatelessWidget {
           ),
         ),
       ),
-    );
-  }
+    ),
+  );
+}
 }
 
 class _DiagRow extends StatelessWidget {

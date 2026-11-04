@@ -14,6 +14,7 @@ import 'presentation/gps_running/views/gps_running_view.dart';
 import 'presentation/nutrition/views/nutrition_view.dart';
 import 'presentation/settings/views/settings_view.dart';
 import 'presentation/social_feed/views/social_feed_view.dart';
+import 'presentation/splash/splash_view.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -50,7 +51,7 @@ class FitoneApp extends StatelessWidget {
           theme: AppTheme.lightTheme,
           darkTheme: AppTheme.darkTheme,
           themeMode: themeStore.themeMode,
-          home: const MainNavigationShell(),
+          home: const SplashView(),
         );
       },
     );
