@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'barbell_plate_calculator_sheet.dart';
 
 class OneRmCalculatorSheet extends StatefulWidget {
   final double initialWeight;
@@ -171,10 +172,30 @@ class _OneRmCalculatorSheetState extends State<OneRmCalculatorSheet> {
                 Row(
                   mainAxisAlignment: MainAxisAlignment.spaceAround,
                   children: [
-                    _PercentPill(pct: '90%', weight: '${(_avg1Rm * 0.90).toStringAsFixed(1)} kg', reps: '3-4 reps'),
-                    _PercentPill(pct: '85%', weight: '${(_avg1Rm * 0.85).toStringAsFixed(1)} kg', reps: '5-6 reps'),
-                    _PercentPill(pct: '80%', weight: '${(_avg1Rm * 0.80).toStringAsFixed(1)} kg', reps: '7-8 reps'),
-                    _PercentPill(pct: '70%', weight: '${(_avg1Rm * 0.70).toStringAsFixed(1)} kg', reps: '10-12 reps'),
+                    _PercentPill(
+                      pct: '90%',
+                      weight: '${(_avg1Rm * 0.90).toStringAsFixed(1)} kg',
+                      rawWeight: _avg1Rm * 0.90,
+                      reps: '3-4 reps',
+                    ),
+                    _PercentPill(
+                      pct: '85%',
+                      weight: '${(_avg1Rm * 0.85).toStringAsFixed(1)} kg',
+                      rawWeight: _avg1Rm * 0.85,
+                      reps: '5-6 reps',
+                    ),
+                    _PercentPill(
+                      pct: '80%',
+                      weight: '${(_avg1Rm * 0.80).toStringAsFixed(1)} kg',
+                      rawWeight: _avg1Rm * 0.80,
+                      reps: '7-8 reps',
+                    ),
+                    _PercentPill(
+                      pct: '70%',
+                      weight: '${(_avg1Rm * 0.70).toStringAsFixed(1)} kg',
+                      rawWeight: _avg1Rm * 0.70,
+                      reps: '10-12 reps',
+                    ),
                   ],
                 ),
                 const SizedBox(height: 16),
@@ -224,28 +245,41 @@ class _CalculationMetric extends StatelessWidget {
 class _PercentPill extends StatelessWidget {
   final String pct;
   final String weight;
+  final double rawWeight;
   final String reps;
 
-  const _PercentPill({required this.pct, required this.weight, required this.reps});
+  const _PercentPill({
+    required this.pct,
+    required this.weight,
+    required this.rawWeight,
+    required this.reps,
+  });
 
   @override
   Widget build(BuildContext context) {
     final colorScheme = Theme.of(context).colorScheme;
 
-    return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 8),
-      decoration: BoxDecoration(
-        color: colorScheme.surfaceContainer,
+    return Material(
+      color: Colors.transparent,
+      child: InkWell(
         borderRadius: BorderRadius.circular(10),
-        border: Border.all(color: colorScheme.outlineVariant),
-      ),
-      child: Column(
-        children: [
-          Text(pct, style: TextStyle(fontSize: 11, fontWeight: FontWeight.w700, color: colorScheme.secondary)),
-          const SizedBox(height: 2),
-          Text(weight, style: TextStyle(fontSize: 12, fontWeight: FontWeight.w700, color: colorScheme.onSurface)),
-          Text(reps, style: TextStyle(fontSize: 9, color: colorScheme.onSurfaceVariant)),
-        ],
+        onTap: () => BarbellPlateCalculatorSheet.show(context, initialWeight: rawWeight),
+        child: Container(
+          padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 8),
+          decoration: BoxDecoration(
+            color: colorScheme.surfaceContainer,
+            borderRadius: BorderRadius.circular(10),
+            border: Border.all(color: colorScheme.outlineVariant),
+          ),
+          child: Column(
+            children: [
+              Text(pct, style: TextStyle(fontSize: 11, fontWeight: FontWeight.w700, color: colorScheme.secondary)),
+              const SizedBox(height: 2),
+              Text(weight, style: TextStyle(fontSize: 12, fontWeight: FontWeight.w700, color: colorScheme.onSurface)),
+              Text(reps, style: TextStyle(fontSize: 9, color: colorScheme.onSurfaceVariant)),
+            ],
+          ),
+        ),
       ),
     );
   }

@@ -5,6 +5,7 @@ import '../../../core/theme/theme_store.dart';
 import '../../../core/utils/app_feedback.dart';
 import '../stores/exercise_store.dart';
 import '../stores/workout_logger_store.dart';
+import '../widgets/barbell_plate_calculator_sheet.dart';
 import '../widgets/one_rm_calculator_sheet.dart';
 import '../widgets/rest_timer_dialog.dart';
 
@@ -149,6 +150,23 @@ class _WorkoutLoggerViewState extends State<WorkoutLoggerView> {
                 ),
               ),
               IconButton(
+                key: const ValueKey('plate_calculator_appbar_button'),
+                onPressed: () => BarbellPlateCalculatorSheet.show(
+                  context,
+                  initialWeight: double.tryParse(_weightController.text) ?? _inputWeight,
+                  unit: unit,
+                  onWeightApplied: (weight) {
+                    setState(() {
+                      _inputWeight = weight.clamp(0, 300);
+                      _weightController.text = weight.toStringAsFixed(1);
+                      _weightErrorText = null;
+                    });
+                  },
+                ),
+                icon: Icon(Icons.fitness_center_rounded, color: colorScheme.primary),
+                tooltip: 'Barbell Plate Calculator',
+              ),
+              IconButton(
                 onPressed: () => OneRmCalculatorSheet.show(context),
                 icon: Icon(Icons.calculate_outlined, color: colorScheme.secondary),
                 tooltip: '1RM Calculator',
@@ -284,6 +302,23 @@ class _WorkoutLoggerViewState extends State<WorkoutLoggerView> {
                         errorText: _weightErrorText,
                         isDense: true,
                         contentPadding: const EdgeInsets.symmetric(horizontal: 10, vertical: 8),
+                        suffixIcon: IconButton(
+                          key: const ValueKey('quick_plate_calc_suffix_button'),
+                          icon: Icon(Icons.view_column_rounded, size: 18, color: colorScheme.primary),
+                          tooltip: 'Calculate Plates',
+                          onPressed: () => BarbellPlateCalculatorSheet.show(
+                            context,
+                            initialWeight: double.tryParse(_weightController.text) ?? _inputWeight,
+                            unit: unit,
+                            onWeightApplied: (weight) {
+                              setState(() {
+                                _inputWeight = weight.clamp(0, 300);
+                                _weightController.text = weight.toStringAsFixed(1);
+                                _weightErrorText = null;
+                              });
+                            },
+                          ),
+                        ),
                       ),
                       onChanged: (val) {
                         final v = double.tryParse(val);
