@@ -53,11 +53,10 @@ class SocialStore {
 
     final post = _posts[index];
     final newLiked = !post.isLiked;
+    final newCount = newLiked ? post.likesCount + 1 : (post.likesCount > 0 ? post.likesCount - 1 : 0);
 
     runInAction(() {
-      post.isLiked = newLiked;
-      post.likesCount = newLiked ? post.likesCount + 1 : (post.likesCount - 1).clamp(0, 9999);
-      _posts[index] = post;
+      _posts[index] = post.copyWith(isLiked: newLiked, likesCount: newCount);
     });
 
     await socialRepository.toggleLike(postId, newLiked);

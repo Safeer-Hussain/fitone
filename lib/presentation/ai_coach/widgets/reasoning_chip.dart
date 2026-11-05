@@ -2,11 +2,18 @@ import 'package:flutter/material.dart';
 
 class ReasoningChip extends StatelessWidget {
   final String reasoning;
+  final bool isStreaming;
 
-  const ReasoningChip({super.key, required this.reasoning});
+  const ReasoningChip({
+    super.key,
+    required this.reasoning,
+    this.isStreaming = true,
+  });
 
   @override
   Widget build(BuildContext context) {
+    if (!isStreaming) return const SizedBox.shrink();
+
     final theme = Theme.of(context);
     final colorScheme = theme.colorScheme;
 

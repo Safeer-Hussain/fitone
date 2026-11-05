@@ -14,6 +14,7 @@ class AiCoachStore {
 
   final _isStreaming = Observable<bool>(false);
   bool get isStreaming => _isStreaming.value;
+  bool get isGenerating => _isStreaming.value;
 
   final _activeReasoning = Observable<String?>(null);
   String? get activeReasoning => _activeReasoning.value;
@@ -65,37 +66,39 @@ class AiCoachStore {
       _activeReasoning.value = null;
     });
 
-    final stream = aiCoachRepository.generateStreamingAdvice(
-      prompt: prompt,
-      onReasoningGenerated: (reasoning) {
+    try {
+      final stream = aiCoachRepository.generateStreamingAdvice(
+        prompt: prompt,
+        onReasoningGenerated: (reasoning) {
+          runInAction(() {
+            _activeReasoning.value = reasoning;
+            final idx = _messages.indexWhere((m) => m.id == aiMsgId);
+            if (idx != -1) {
+              _messages[idx] = _messages[idx].copyWith(reasoning: reasoning);
+            }
+          });
+        },
+      );
+
+      final fullResponse = StringBuffer();
+      await for (final token in stream) {
+        fullResponse.write(token);
         runInAction(() {
-          _activeReasoning.value = reasoning;
           final idx = _messages.indexWhere((m) => m.id == aiMsgId);
           if (idx != -1) {
-            _messages[idx] = _messages[idx].copyWith(reasoning: reasoning);
+            _messages[idx] = _messages[idx].copyWith(text: fullResponse.toString());
           }
         });
-      },
-    );
-
-    StringBuffer fullResponse = StringBuffer();
-    await for (final token in stream) {
-      fullResponse.write(token);
+      }
+    } finally {
       runInAction(() {
         final idx = _messages.indexWhere((m) => m.id == aiMsgId);
         if (idx != -1) {
-          _messages[idx] = _messages[idx].copyWith(text: fullResponse.toString());
+          _messages[idx] = _messages[idx].copyWith(isStreaming: false);
         }
+        _isStreaming.value = false;
+        _activeReasoning.value = null;
       });
     }
-
-    runInAction(() {
-      final idx = _messages.indexWhere((m) => m.id == aiMsgId);
-      if (idx != -1) {
-        _messages[idx] = _messages[idx].copyWith(isStreaming: false);
-      }
-      _isStreaming.value = false;
-      _activeReasoning.value = null;
-    });
   }
 }

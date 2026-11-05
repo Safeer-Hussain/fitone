@@ -45,6 +45,36 @@ class SocialPost {
     required this.timestamp,
   });
 
+  SocialPost copyWith({
+    String? id,
+    String? userName,
+    String? userHandle,
+    String? avatarInitials,
+    String? postType,
+    String? title,
+    String? description,
+    Map<String, dynamic>? metrics,
+    int? likesCount,
+    bool? isLiked,
+    List<PostComment>? comments,
+    DateTime? timestamp,
+  }) {
+    return SocialPost(
+      id: id ?? this.id,
+      userName: userName ?? this.userName,
+      userHandle: userHandle ?? this.userHandle,
+      avatarInitials: avatarInitials ?? this.avatarInitials,
+      postType: postType ?? this.postType,
+      title: title ?? this.title,
+      description: description ?? this.description,
+      metrics: metrics ?? this.metrics,
+      likesCount: likesCount ?? this.likesCount,
+      isLiked: isLiked ?? this.isLiked,
+      comments: comments ?? this.comments,
+      timestamp: timestamp ?? this.timestamp,
+    );
+  }
+
   factory SocialPost.fromMap(Map<String, dynamic> map) {
     final rawMetrics = jsonDecode(map['metrics_json'] as String) as Map<String, dynamic>;
     final rawComments = jsonDecode(map['comments_json'] as String) as List<dynamic>;

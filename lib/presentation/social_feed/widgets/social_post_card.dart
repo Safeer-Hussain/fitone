@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_mobx/flutter_mobx.dart';
 import '../../../domain/entities/social_post.dart';
 import '../stores/social_store.dart';
 
@@ -26,20 +27,26 @@ class _SocialPostCardState extends State<SocialPostCard> {
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     final colorScheme = theme.colorScheme;
-    final post = widget.post;
 
-    return Card(
-      color: colorScheme.surface,
-      shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(16),
-        side: BorderSide(color: colorScheme.outlineVariant),
-      ),
-      margin: const EdgeInsets.only(bottom: 14),
-      child: Padding(
-        padding: const EdgeInsets.all(16),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
+    return Observer(
+      builder: (_) {
+        final post = widget.store.posts.firstWhere(
+          (p) => p.id == widget.post.id,
+          orElse: () => widget.post,
+        );
+
+        return Card(
+          color: colorScheme.surface,
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(16),
+            side: BorderSide(color: colorScheme.outlineVariant),
+          ),
+          margin: const EdgeInsets.only(bottom: 14),
+          child: Padding(
+            padding: const EdgeInsets.all(16),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
             Row(
               children: [
                 CircleAvatar(
@@ -189,6 +196,8 @@ class _SocialPostCardState extends State<SocialPostCard> {
           ],
         ),
       ),
+    );
+      },
     );
   }
 }

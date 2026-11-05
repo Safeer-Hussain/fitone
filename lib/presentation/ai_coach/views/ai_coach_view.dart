@@ -73,65 +73,103 @@ class _AiCoachViewState extends State<AiCoachView> {
           );
         }
 
-        Widget buildInputField() {
-          return Container(
-            padding: EdgeInsets.fromLTRB(
-              isLandscape ? 10 : 16,
-              isLandscape ? 4 : 8,
-              isLandscape ? 10 : 16,
-              (isLandscape ? 6 : 16) + MediaQuery.of(context).viewInsets.bottom,
-            ),
-            decoration: BoxDecoration(
-              color: colorScheme.surface,
-              border: Border(top: BorderSide(color: colorScheme.outlineVariant)),
-            ),
-            child: Row(
-              children: [
-                Expanded(
-                  child: SizedBox(
-                    height: isLandscape ? 38 : null,
-                    child: TextField(
-                      controller: _textController,
-                      decoration: InputDecoration(
-                        hintText: 'Ask AI Coach about HRV, recovery, or macros...',
-                        isDense: true,
-                        contentPadding: EdgeInsets.symmetric(
-                          horizontal: 12,
-                          vertical: isLandscape ? 8 : 12,
-                        ),
-                        hintStyle: TextStyle(
-                          fontSize: isLandscape ? 12 : 14,
+        Widget buildStreamingIndicator() {
+          return Observer(
+            builder: (_) {
+              if (!_store.isGenerating) return const SizedBox.shrink();
+              return Padding(
+                padding: const EdgeInsets.symmetric(vertical: 6, horizontal: 16),
+                child: Row(
+                  children: [
+                    SizedBox(
+                      width: 14,
+                      height: 14,
+                      child: CircularProgressIndicator(
+                        key: const ValueKey('streaming_indicator_spinner'),
+                        strokeWidth: 2,
+                        valueColor: AlwaysStoppedAnimation(colorScheme.tertiary),
+                      ),
+                    ),
+                    const SizedBox(width: 8),
+                    Expanded(
+                      child: Text(
+                        _store.activeReasoning ?? "Analyzing telemetry context...",
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
+                        style: TextStyle(
+                          fontSize: 12,
                           color: colorScheme.onSurfaceVariant,
+                          fontStyle: FontStyle.italic,
                         ),
                       ),
-                      onSubmitted: (text) {
-                        _store.sendUserPrompt(text);
-                        _textController.clear();
-                        _scrollToBottom();
-                      },
+                    ),
+                  ],
+                ),
+              );
+            },
+          );
+        }
+
+        Widget buildInputField() {
+          return SafeArea(
+            top: false,
+            child: Container(
+              padding: EdgeInsets.symmetric(
+                horizontal: isLandscape ? 10 : 16,
+                vertical: isLandscape ? 6 : 8,
+              ),
+              decoration: BoxDecoration(
+                color: colorScheme.surface,
+                border: Border(top: BorderSide(color: colorScheme.outlineVariant)),
+              ),
+              child: Row(
+                children: [
+                  Expanded(
+                    child: SizedBox(
+                      height: isLandscape ? 38 : null,
+                      child: TextField(
+                        controller: _textController,
+                        decoration: InputDecoration(
+                          hintText: 'Ask AI Coach about HRV, recovery, or macros...',
+                          isDense: true,
+                          contentPadding: EdgeInsets.symmetric(
+                            horizontal: 12,
+                            vertical: isLandscape ? 8 : 12,
+                          ),
+                          hintStyle: TextStyle(
+                            fontSize: isLandscape ? 12 : 14,
+                            color: colorScheme.onSurfaceVariant,
+                          ),
+                        ),
+                        onSubmitted: (text) {
+                          _store.sendUserPrompt(text);
+                          _textController.clear();
+                          _scrollToBottom();
+                        },
+                      ),
                     ),
                   ),
-                ),
-                const SizedBox(width: 8),
-                Observer(
-                  builder: (_) => IconButton.filled(
-                    onPressed: _store.isStreaming
-                        ? null
-                        : () {
-                            _store.sendUserPrompt(_textController.text);
-                            _textController.clear();
-                            _scrollToBottom();
-                          },
-                    icon: const Icon(Icons.arrow_upward_rounded, size: 18),
-                    style: IconButton.styleFrom(
-                      backgroundColor: colorScheme.primary,
-                      foregroundColor: colorScheme.onPrimary,
-                      padding: const EdgeInsets.all(8),
-                      minimumSize: const Size(36, 36),
+                  const SizedBox(width: 8),
+                  Observer(
+                    builder: (_) => IconButton.filled(
+                      onPressed: _store.isGenerating
+                          ? null
+                          : () {
+                              _store.sendUserPrompt(_textController.text);
+                              _textController.clear();
+                              _scrollToBottom();
+                            },
+                      icon: const Icon(Icons.arrow_upward_rounded, size: 18),
+                      style: IconButton.styleFrom(
+                        backgroundColor: colorScheme.primary,
+                        foregroundColor: colorScheme.onPrimary,
+                        padding: const EdgeInsets.all(8),
+                        minimumSize: const Size(36, 36),
+                      ),
                     ),
                   ),
-                ),
-              ],
+                ],
+              ),
             ),
           );
         }
@@ -226,6 +264,7 @@ class _AiCoachViewState extends State<AiCoachView> {
         }
 
         return Scaffold(
+          resizeToAvoidBottomInset: true,
           appBar: AppBar(
             toolbarHeight: isLandscape ? 36 : null,
             title: Row(
@@ -255,6 +294,7 @@ class _AiCoachViewState extends State<AiCoachView> {
                         child: Column(
                           children: [
                             Expanded(child: buildChatList()),
+                            buildStreamingIndicator(),
                             buildInputField(),
                           ],
                         ),
@@ -265,6 +305,7 @@ class _AiCoachViewState extends State<AiCoachView> {
                     children: [
                       buildQuickPromptsList(horizontal: true),
                       Expanded(child: buildChatList()),
+                      buildStreamingIndicator(),
                       buildInputField(),
                     ],
                   ),

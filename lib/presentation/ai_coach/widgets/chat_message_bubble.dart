@@ -18,8 +18,8 @@ class ChatMessageBubble extends StatelessWidget {
       child: Column(
         crossAxisAlignment: isUser ? CrossAxisAlignment.end : CrossAxisAlignment.start,
         children: [
-          if (message.reasoning != null && message.reasoning!.isNotEmpty)
-            ReasoningChip(reasoning: message.reasoning!),
+          if (message.reasoning != null && message.reasoning!.isNotEmpty && message.isStreaming)
+            ReasoningChip(reasoning: message.reasoning!, isStreaming: message.isStreaming),
           Row(
             mainAxisAlignment: isUser ? MainAxisAlignment.end : MainAxisAlignment.start,
             crossAxisAlignment: CrossAxisAlignment.start,
