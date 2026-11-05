@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import '../../../core/utils/app_feedback.dart';
 
 class SleepArchitectureCard extends StatelessWidget {
   final int sleepScore;
@@ -19,7 +20,10 @@ class SleepArchitectureCard extends StatelessWidget {
     const purpleAccent = Color(0xFFB388FF);
 
     return Card(
-      child: Padding(
+      child: InkWell(
+        borderRadius: BorderRadius.circular(16),
+        onTap: () => _showSleepBreakdownSheet(context, colorScheme),
+        child: Padding(
         padding: EdgeInsets.all(isCompact ? 12 : 20),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
@@ -62,12 +66,16 @@ class SleepArchitectureCard extends StatelessWidget {
                   'Total Duration',
                   style: TextStyle(color: colorScheme.onSurfaceVariant, fontSize: isCompact ? 11 : 13),
                 ),
-                Text(
-                  '7h 48m (91% Efficiency)',
-                  style: TextStyle(
-                    color: colorScheme.onSurface,
-                    fontWeight: FontWeight.w600,
-                    fontSize: isCompact ? 11 : 13,
+                Flexible(
+                  child: Text(
+                    '7h 48m (91% Efficiency)',
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                    style: TextStyle(
+                      color: colorScheme.onSurface,
+                      fontWeight: FontWeight.w600,
+                      fontSize: isCompact ? 11 : 13,
+                    ),
                   ),
                 ),
               ],
@@ -88,8 +96,9 @@ class SleepArchitectureCard extends StatelessWidget {
               ),
             ),
             SizedBox(height: isCompact ? 8 : 14),
-            const Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            const Wrap(
+              spacing: 12,
+              runSpacing: 4,
               children: [
                 _SleepStageLegend(color: Color(0xFF6366F1), label: 'Deep (1h 52m)'),
                 _SleepStageLegend(color: Color(0xFF8B5CF6), label: 'REM (1h 43m)'),
@@ -100,6 +109,105 @@ class SleepArchitectureCard extends StatelessWidget {
           ],
         ),
       ),
+      ),
+    );
+  }
+
+  void _showSleepBreakdownSheet(BuildContext context, ColorScheme colorScheme) {
+    AppFeedback.showInfo(context, 'Sleep Performance: Score $sleepScore • 7h 48m Total Rest');
+    showModalBottomSheet(
+      context: context,
+      isScrollControlled: true,
+      backgroundColor: Colors.transparent,
+      builder: (sheetContext) {
+        return SafeArea(
+          child: Container(
+            margin: const EdgeInsets.all(12),
+            decoration: BoxDecoration(
+              color: colorScheme.surface,
+              borderRadius: BorderRadius.circular(24),
+              border: Border.all(color: colorScheme.outlineVariant),
+            ),
+            child: Padding(
+              padding: const EdgeInsets.all(20),
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Center(
+                    child: Container(
+                      width: 40,
+                      height: 4,
+                      decoration: BoxDecoration(
+                        color: colorScheme.outlineVariant,
+                        borderRadius: BorderRadius.circular(2),
+                      ),
+                    ),
+                  ),
+                  const SizedBox(height: 16),
+                  Row(
+                    children: [
+                      const Icon(Icons.bedtime_rounded, color: Color(0xFFB388FF), size: 22),
+                      const SizedBox(width: 8),
+                      Text(
+                        'Sleep Architecture & Hypnogram',
+                        style: TextStyle(fontSize: 16, fontWeight: FontWeight.w700, color: colorScheme.onSurface),
+                      ),
+                    ],
+                  ),
+                  const SizedBox(height: 14),
+                  Container(
+                    padding: const EdgeInsets.all(14),
+                    decoration: BoxDecoration(
+                      color: colorScheme.surfaceContainerHighest,
+                      borderRadius: BorderRadius.circular(12),
+                      border: Border.all(color: colorScheme.outlineVariant),
+                    ),
+                    child: Column(
+                      children: [
+                        _buildSleepRow('Total Sleep Time', '7 hours 48 minutes', colorScheme),
+                        Divider(color: colorScheme.outlineVariant, height: 16),
+                        _buildSleepRow('Deep Restorative Sleep', '1h 52m (24% of night)', colorScheme),
+                        Divider(color: colorScheme.outlineVariant, height: 16),
+                        _buildSleepRow('REM Cognitive Phase', '1h 43m (22% of night)', colorScheme),
+                        Divider(color: colorScheme.outlineVariant, height: 16),
+                        _buildSleepRow('Light Sleep Phase', '3h 35m (48% of night)', colorScheme),
+                        Divider(color: colorScheme.outlineVariant, height: 16),
+                        _buildSleepRow('Sleep Efficiency', '94% time asleep in bed', colorScheme),
+                        Divider(color: colorScheme.outlineVariant, height: 16),
+                        _buildSleepRow('Circadian Regularity', 'Optimal 23:15 -> 07:05 window', colorScheme),
+                      ],
+                    ),
+                  ),
+                  const SizedBox(height: 16),
+                  SizedBox(
+                    width: double.infinity,
+                    child: ElevatedButton(
+                      onPressed: () => Navigator.pop(sheetContext),
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: colorScheme.primary,
+                        foregroundColor: colorScheme.onPrimary,
+                      ),
+                      child: const Text('Close'),
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ),
+        );
+      },
+    );
+  }
+
+  Widget _buildSleepRow(String label, String value, ColorScheme colorScheme) {
+    return Row(
+      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+      children: [
+        Expanded(child: Text(label, style: TextStyle(fontSize: 12, color: colorScheme.onSurfaceVariant))),
+        const SizedBox(width: 8),
+        Text(value, style: TextStyle(fontSize: 12, fontWeight: FontWeight.w700, color: colorScheme.onSurface)),
+      ],
     );
   }
 }

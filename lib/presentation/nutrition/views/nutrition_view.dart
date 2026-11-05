@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_mobx/flutter_mobx.dart';
 import '../../../core/di/injection.dart';
 import '../../../core/theme/theme_store.dart';
+import '../../../core/utils/app_feedback.dart';
 import '../../../domain/entities/nutrition_day.dart';
 import '../stores/nutrition_store.dart';
 import '../widgets/hydration_tracker_card.dart';
@@ -124,6 +125,7 @@ class _NutritionViewState extends State<NutritionView> {
           ),
           floatingActionButton: isLandscape
               ? FloatingActionButton.small(
+                  heroTag: 'fab_nutrition_add_small',
                   onPressed: () => QuickAddFoodDialog.show(context, _store),
                   backgroundColor: colorScheme.primary,
                   foregroundColor: colorScheme.onPrimary,
@@ -131,6 +133,7 @@ class _NutritionViewState extends State<NutritionView> {
                   child: const Icon(Icons.add_rounded),
                 )
               : FloatingActionButton.extended(
+                  heroTag: 'fab_nutrition_add',
                   onPressed: () => QuickAddFoodDialog.show(context, _store),
                   backgroundColor: colorScheme.primary,
                   foregroundColor: colorScheme.onPrimary,
@@ -220,7 +223,10 @@ class _NutritionViewState extends State<NutritionView> {
                             ),
                           ),
                           IconButton(
-                            onPressed: () => _store.deleteFood(item.id),
+                            onPressed: () {
+                              _store.deleteFood(item.id);
+                              AppFeedback.showInfo(context, '${item.foodName} removed from log');
+                            },
                             icon: Icon(Icons.close_rounded, size: 15, color: colorScheme.onSurfaceVariant),
                             padding: EdgeInsets.zero,
                             constraints: const BoxConstraints(),

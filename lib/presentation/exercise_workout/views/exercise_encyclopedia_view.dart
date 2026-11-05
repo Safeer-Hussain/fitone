@@ -83,6 +83,7 @@ class _ExerciseEncyclopediaViewState extends State<ExerciseEncyclopediaView> {
             ),
             floatingActionButton: isLandscape
                 ? FloatingActionButton.small(
+                    heroTag: 'fab_exercise_encyclopedia_small',
                     onPressed: () {
                       Navigator.of(context).push(
                         MaterialPageRoute(builder: (_) => const WorkoutLoggerView()),
@@ -94,6 +95,7 @@ class _ExerciseEncyclopediaViewState extends State<ExerciseEncyclopediaView> {
                     child: const Icon(Icons.play_arrow_rounded),
                   )
                 : FloatingActionButton.extended(
+                    heroTag: 'fab_exercise_encyclopedia',
                     onPressed: () {
                       Navigator.of(context).push(
                         MaterialPageRoute(builder: (_) => const WorkoutLoggerView()),
@@ -303,48 +305,48 @@ class _ExerciseEncyclopediaViewState extends State<ExerciseEncyclopediaView> {
         SizedBox(
           height: 38,
           child: Observer(
-            builder: (_) => ListView.builder(
-              scrollDirection: Axis.horizontal,
-              padding: const EdgeInsets.symmetric(horizontal: 16),
-              itemCount: _store.bodyParts.length,
-              itemBuilder: (context, index) {
-                final part = _store.bodyParts[index];
-                final isSelected = _store.selectedBodyPart == part;
-
-                return Padding(
-                  padding: const EdgeInsets.only(right: 8),
-                  child: FilterChip(
-                    label: Text(part),
-                    selected: isSelected,
-                    onSelected: (_) => _store.setBodyPart(part),
-                  ),
-                );
-              },
-            ),
+            builder: (_) {
+              final selectedPart = _store.selectedBodyPart;
+              return ListView(
+                scrollDirection: Axis.horizontal,
+                padding: const EdgeInsets.symmetric(horizontal: 16),
+                children: _store.bodyParts.map((part) {
+                  final isSelected = selectedPart == part;
+                  return Padding(
+                    padding: const EdgeInsets.only(right: 8),
+                    child: FilterChip(
+                      label: Text(part),
+                      selected: isSelected,
+                      onSelected: (_) => _store.setBodyPart(part),
+                    ),
+                  );
+                }).toList(),
+              );
+            },
           ),
         ),
         const SizedBox(height: 8),
         SizedBox(
           height: 38,
           child: Observer(
-            builder: (_) => ListView.builder(
-              scrollDirection: Axis.horizontal,
-              padding: const EdgeInsets.symmetric(horizontal: 16),
-              itemCount: _store.equipmentList.length,
-              itemBuilder: (context, index) {
-                final eq = _store.equipmentList[index];
-                final isSelected = _store.selectedEquipment == eq;
-
-                return Padding(
-                  padding: const EdgeInsets.only(right: 8),
-                  child: ChoiceChip(
-                    label: Text(eq),
-                    selected: isSelected,
-                    onSelected: (_) => _store.setEquipment(eq),
-                  ),
-                );
-              },
-            ),
+            builder: (_) {
+              final selectedEq = _store.selectedEquipment;
+              return ListView(
+                scrollDirection: Axis.horizontal,
+                padding: const EdgeInsets.symmetric(horizontal: 16),
+                children: _store.equipmentList.map((eq) {
+                  final isSelected = selectedEq == eq;
+                  return Padding(
+                    padding: const EdgeInsets.only(right: 8),
+                    child: ChoiceChip(
+                      label: Text(eq),
+                      selected: isSelected,
+                      onSelected: (_) => _store.setEquipment(eq),
+                    ),
+                  );
+                }).toList(),
+              );
+            },
           ),
         ),
         const SizedBox(height: 8),

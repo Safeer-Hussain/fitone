@@ -40,6 +40,15 @@ class AiCoachStore {
     }
   }
 
+  void clearChat() {
+    runInAction(() {
+      _messages.clear();
+      _isStreaming.value = false;
+      _activeReasoning.value = null;
+    });
+    initialize();
+  }
+
   Future<void> sendUserPrompt(String prompt) async {
     if (prompt.trim().isEmpty || _isStreaming.value) return;
 

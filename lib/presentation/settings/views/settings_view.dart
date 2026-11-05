@@ -1,8 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_mobx/flutter_mobx.dart';
+import '../../../core/database/app_database.dart';
 import '../../../core/di/injection.dart';
 import '../../../core/theme/theme_store.dart';
+import '../../../core/utils/app_feedback.dart';
 import '../../../core/widgets/developer_debug_drawer.dart';
+import '../../exercise_workout/stores/workout_logger_store.dart';
 
 class SettingsView extends StatelessWidget {
   const SettingsView({super.key});
@@ -16,6 +19,8 @@ class SettingsView extends StatelessWidget {
         final _ = themeStore.themeMode;
         final theme = Theme.of(context);
         final colorScheme = theme.colorScheme;
+
+        final loggerStore = sl<WorkoutLoggerStore>();
 
         return Scaffold(
           appBar: AppBar(
@@ -56,7 +61,13 @@ class SettingsView extends StatelessWidget {
                           ),
                           value: themeStore.isDarkMode,
                           activeColor: colorScheme.primary,
-                          onChanged: (_) => themeStore.toggleTheme(),
+                          onChanged: (_) {
+                            themeStore.toggleTheme();
+                            AppFeedback.showSuccess(
+                              context,
+                              themeStore.isDarkMode ? 'Dark obsidian theme activated' : 'Light high-contrast theme activated',
+                            );
+                          },
                         ),
                         Divider(color: colorScheme.outlineVariant),
                         ListTile(
@@ -65,10 +76,49 @@ class SettingsView extends StatelessWidget {
                             style: TextStyle(fontWeight: FontWeight.w600, fontSize: 14, color: colorScheme.onSurface),
                           ),
                           subtitle: Text(
-                            'Metric (kg, km, Celsius)',
+                            loggerStore.unit == 'kg' ? 'Metric (kg, km, Celsius)' : 'Imperial (lbs, miles, Fahrenheit)',
                             style: TextStyle(fontSize: 12, color: colorScheme.onSurfaceVariant),
                           ),
-                          trailing: Icon(Icons.check_rounded, color: colorScheme.primary),
+                          trailing: Container(
+                            padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+                            decoration: BoxDecoration(
+                              color: colorScheme.primary.withValues(alpha: 0.15),
+                              borderRadius: BorderRadius.circular(8),
+                            ),
+                            child: Text(
+                              loggerStore.unit.toUpperCase(),
+                              style: TextStyle(fontWeight: FontWeight.w800, color: colorScheme.primary, fontSize: 12),
+                            ),
+                          ),
+                          onTap: () {
+                            loggerStore.toggleUnit();
+                            AppFeedback.showSuccess(
+                              context,
+                              'Biometric units switched to ${loggerStore.unit == 'kg' ? 'Metric (kg, km)' : 'Imperial (lbs, miles)'}',
+                            );
+                          },
+                        ),
+                        Divider(color: colorScheme.outlineVariant),
+                        ListTile(
+                          leading: Icon(Icons.cleaning_services_rounded, color: colorScheme.primary),
+                          title: Text(
+                            'Purge Telemetry & Cache',
+                            style: TextStyle(fontWeight: FontWeight.w600, fontSize: 14, color: colorScheme.onSurface),
+                          ),
+                          subtitle: Text(
+                            'Clear transient workout and run logs, keep seed data',
+                            style: TextStyle(fontSize: 12, color: colorScheme.onSurfaceVariant),
+                          ),
+                          trailing: Icon(Icons.arrow_forward_ios_rounded, size: 14, color: colorScheme.onSurfaceVariant),
+                          onTap: () async {
+                            final db = await AppDatabase.instance.database;
+                            await db.delete('workouts');
+                            await db.delete('workout_sets');
+                            await db.delete('running_routes');
+                            if (context.mounted) {
+                              AppFeedback.showSuccess(context, 'Local telemetry and session cache purged');
+                            }
+                          },
                         ),
                       ],
                     ),

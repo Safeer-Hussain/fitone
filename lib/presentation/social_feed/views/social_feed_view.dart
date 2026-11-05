@@ -61,6 +61,7 @@ class _SocialFeedViewState extends State<SocialFeedView> {
               ],
             ),
             floatingActionButton: FloatingActionButton.extended(
+              heroTag: 'fab_social_feed',
               onPressed: () => _showCreatePostDialog(context, colorScheme),
               backgroundColor: colorScheme.primary,
               foregroundColor: colorScheme.onPrimary,

@@ -120,6 +120,7 @@ class _QuickAddFoodDialogState extends State<QuickAddFoodDialog> {
       _carbsError = null;
       _fatError = null;
     });
+    AppFeedback.showInfo(context, 'Autofilled preset: ${t['name']}');
   }
 
   Future<void> _submitFoodLog() async {

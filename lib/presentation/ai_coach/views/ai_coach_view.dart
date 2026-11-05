@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_mobx/flutter_mobx.dart';
 import '../../../core/di/injection.dart';
 import '../../../core/theme/theme_store.dart';
+import '../../../core/utils/app_feedback.dart';
 import '../stores/ai_coach_store.dart';
 import '../widgets/chat_message_bubble.dart';
 
@@ -277,6 +278,14 @@ class _AiCoachViewState extends State<AiCoachView> {
                 ),
               ],
             ),
+            actions: [
+              IconButton(
+                key: const ValueKey('ai_coach_clear_chat_button'),
+                icon: Icon(Icons.delete_sweep_outlined, color: colorScheme.onSurfaceVariant, size: isLandscape ? 18 : 22),
+                tooltip: 'Clear Chat & Reset Context',
+                onPressed: () => _confirmResetChat(context, colorScheme),
+              ),
+            ],
           ),
           body: SafeArea(
             child: isLandscape
@@ -310,6 +319,52 @@ class _AiCoachViewState extends State<AiCoachView> {
                     ],
                   ),
           ),
+        );
+      },
+    );
+  }
+
+  void _confirmResetChat(BuildContext context, ColorScheme colorScheme) {
+    showDialog(
+      context: context,
+      builder: (dialogContext) {
+        return AlertDialog(
+          backgroundColor: colorScheme.surface,
+          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+          title: Row(
+            children: [
+              Icon(Icons.delete_sweep_outlined, color: colorScheme.error, size: 22),
+              const SizedBox(width: 8),
+              Expanded(
+                child: Text(
+                  'Reset AI Conversation?',
+                  style: TextStyle(fontSize: 16, fontWeight: FontWeight.w700, color: colorScheme.onSurface),
+                ),
+              ),
+            ],
+          ),
+          content: Text(
+            'This will clear all conversation history and restore default sports science recovery prompts.',
+            style: TextStyle(fontSize: 13, color: colorScheme.onSurfaceVariant),
+          ),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.pop(dialogContext),
+              child: Text('Cancel', style: TextStyle(color: colorScheme.onSurfaceVariant)),
+            ),
+            ElevatedButton(
+              onPressed: () {
+                Navigator.pop(dialogContext);
+                _store.clearChat();
+                AppFeedback.showInfo(context, 'AI conversation and context reset');
+              },
+              style: ElevatedButton.styleFrom(
+                backgroundColor: colorScheme.error,
+                foregroundColor: colorScheme.onError,
+              ),
+              child: const Text('Clear Chat'),
+            ),
+          ],
         );
       },
     );

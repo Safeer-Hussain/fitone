@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import '../../../core/utils/app_feedback.dart';
 import '../../../domain/entities/nutrition_day.dart';
 
 class MacroProgressRing extends StatelessWidget {
@@ -22,7 +23,10 @@ class MacroProgressRing extends StatelessWidget {
         borderRadius: BorderRadius.circular(16),
         side: BorderSide(color: colorScheme.outlineVariant),
       ),
-      child: Padding(
+      child: InkWell(
+        borderRadius: BorderRadius.circular(16),
+        onTap: () => _showMacroBreakdownSheet(context, colorScheme, caloriesRemaining),
+        child: Padding(
         padding: EdgeInsets.all(isCompact ? 12 : 20),
         child: Column(
           children: [
@@ -122,6 +126,113 @@ class MacroProgressRing extends StatelessWidget {
           ],
         ),
       ),
+      ),
+    );
+  }
+
+  void _showMacroBreakdownSheet(BuildContext context, ColorScheme colorScheme, double caloriesRemaining) {
+    AppFeedback.showInfo(
+      context,
+      'Macro Target: ${summary.consumedCalories.toStringAsFixed(0)} / ${summary.targetCalories.toStringAsFixed(0)} kcal (${caloriesRemaining.toStringAsFixed(0)} kcal left)',
+    );
+    showModalBottomSheet(
+      context: context,
+      isScrollControlled: true,
+      backgroundColor: Colors.transparent,
+      builder: (sheetContext) {
+        return SafeArea(
+          child: Container(
+            margin: const EdgeInsets.all(12),
+            decoration: BoxDecoration(
+              color: colorScheme.surface,
+              borderRadius: BorderRadius.circular(24),
+              border: Border.all(color: colorScheme.outlineVariant),
+            ),
+            child: Padding(
+              padding: const EdgeInsets.all(20),
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Center(
+                    child: Container(
+                      width: 40,
+                      height: 4,
+                      decoration: BoxDecoration(
+                        color: colorScheme.outlineVariant,
+                        borderRadius: BorderRadius.circular(2),
+                      ),
+                    ),
+                  ),
+                  const SizedBox(height: 16),
+                  Row(
+                    children: [
+                      Icon(Icons.pie_chart_outline_rounded, color: colorScheme.primary, size: 22),
+                      const SizedBox(width: 10),
+                      Text(
+                        'Macronutrient Distribution',
+                        style: TextStyle(
+                          fontSize: 16,
+                          fontWeight: FontWeight.w700,
+                          color: colorScheme.onSurface,
+                        ),
+                      ),
+                    ],
+                  ),
+                  const SizedBox(height: 16),
+                  Container(
+                    padding: const EdgeInsets.all(14),
+                    decoration: BoxDecoration(
+                      color: colorScheme.surfaceContainerHighest,
+                      borderRadius: BorderRadius.circular(12),
+                      border: Border.all(color: colorScheme.outlineVariant),
+                    ),
+                    child: Column(
+                      children: [
+                        _buildMacroRow('Daily Caloric Target', '${summary.consumedCalories.toStringAsFixed(0)} / ${summary.targetCalories.toStringAsFixed(0)} kcal', colorScheme.primary, colorScheme),
+                        Divider(color: colorScheme.outlineVariant, height: 16),
+                        _buildMacroRow('Protein (4 kcal/g)', '${summary.consumedProteinG.toStringAsFixed(0)} / ${summary.targetProteinG.toStringAsFixed(0)}g (${(summary.proteinProgress * 100).toInt()}%)', colorScheme.primary, colorScheme),
+                        Divider(color: colorScheme.outlineVariant, height: 16),
+                        _buildMacroRow('Carbohydrates (4 kcal/g)', '${summary.consumedCarbsG.toStringAsFixed(0)} / ${summary.targetCarbsG.toStringAsFixed(0)}g (${(summary.carbsProgress * 100).toInt()}%)', colorScheme.secondary, colorScheme),
+                        Divider(color: colorScheme.outlineVariant, height: 16),
+                        _buildMacroRow('Dietary Fats (9 kcal/g)', '${summary.consumedFatG.toStringAsFixed(0)} / ${summary.targetFatG.toStringAsFixed(0)}g (${(summary.fatProgress * 100).toInt()}%)', const Color(0xFFFFB74D), colorScheme),
+                      ],
+                    ),
+                  ),
+                  const SizedBox(height: 16),
+                  SizedBox(
+                    width: double.infinity,
+                    child: ElevatedButton(
+                      onPressed: () => Navigator.pop(sheetContext),
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: colorScheme.primary,
+                        foregroundColor: colorScheme.onPrimary,
+                      ),
+                      child: const Text('Close'),
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ),
+        );
+      },
+    );
+  }
+
+  Widget _buildMacroRow(String title, String val, Color dotColor, ColorScheme colorScheme) {
+    return Row(
+      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+      children: [
+        Row(
+          children: [
+            Container(width: 8, height: 8, decoration: BoxDecoration(color: dotColor, shape: BoxShape.circle)),
+            const SizedBox(width: 8),
+            Text(title, style: TextStyle(fontSize: 12, color: colorScheme.onSurface)),
+          ],
+        ),
+        Text(val, style: TextStyle(fontSize: 12, fontWeight: FontWeight.w700, color: colorScheme.onSurface)),
+      ],
     );
   }
 }

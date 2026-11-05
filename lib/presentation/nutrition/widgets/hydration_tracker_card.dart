@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import '../../../core/utils/app_feedback.dart';
 import '../stores/nutrition_store.dart';
 
 class HydrationTrackerCard extends StatelessWidget {
@@ -108,14 +109,41 @@ class HydrationTrackerCard extends StatelessWidget {
             SizedBox(height: isCompact ? 10 : 18),
             Row(
               children: [
-                _WaterButton(label: '+250ml', onTap: () => store.logWater(250), colorScheme: colorScheme, isCompact: isCompact),
+                _WaterButton(
+                  label: '+250ml',
+                  onTap: () {
+                    store.logWater(250);
+                    AppFeedback.showSuccess(context, 'Logged 250ml water (+0.25L)');
+                  },
+                  colorScheme: colorScheme,
+                  isCompact: isCompact,
+                ),
                 const SizedBox(width: 6),
-                _WaterButton(label: '+500ml', onTap: () => store.logWater(500), colorScheme: colorScheme, isCompact: isCompact),
+                _WaterButton(
+                  label: '+500ml',
+                  onTap: () {
+                    store.logWater(500);
+                    AppFeedback.showSuccess(context, 'Logged 500ml water (+0.50L)');
+                  },
+                  colorScheme: colorScheme,
+                  isCompact: isCompact,
+                ),
                 const SizedBox(width: 6),
-                _WaterButton(label: '+750ml', onTap: () => store.logWater(750), colorScheme: colorScheme, isCompact: isCompact),
+                _WaterButton(
+                  label: '+750ml',
+                  onTap: () {
+                    store.logWater(750);
+                    AppFeedback.showSuccess(context, 'Logged 750ml water (+0.75L)');
+                  },
+                  colorScheme: colorScheme,
+                  isCompact: isCompact,
+                ),
                 const SizedBox(width: 6),
                 IconButton(
-                  onPressed: () => store.resetHydration(),
+                  onPressed: () {
+                    store.resetHydration();
+                    AppFeedback.showInfo(context, 'Hydration reset to 0ml for today');
+                  },
                   icon: Icon(Icons.refresh_rounded, size: isCompact ? 16 : 18, color: colorScheme.onSurfaceVariant),
                   tooltip: 'Reset Day Hydration',
                   padding: EdgeInsets.zero,

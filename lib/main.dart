@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_mobx/flutter_mobx.dart';
+
 import 'core/di/injection.dart';
 import 'core/network/network_monitor.dart';
 import 'core/theme/app_theme.dart';
@@ -126,7 +127,11 @@ class _MainNavigationShellState extends State<MainNavigationShell> {
                 shape: BoxShape.circle,
                 border: Border.all(color: colorScheme.primary, width: 1.5),
               ),
-              child: Icon(Icons.bolt_rounded, size: 16, color: colorScheme.primary),
+              child: Icon(
+                Icons.bolt_rounded,
+                size: 16,
+                color: colorScheme.primary,
+              ),
             ),
             const SizedBox(width: 10),
             const Text(
@@ -142,29 +147,28 @@ class _MainNavigationShellState extends State<MainNavigationShell> {
         actions: [
           IconButton(
             onPressed: () {
-              Navigator.of(context).push(
-                MaterialPageRoute(builder: (_) => const AiCoachView()),
-              );
+              Navigator.of(context)
+                  .push(MaterialPageRoute(builder: (_) => const AiCoachView()));
             },
             icon: Icon(Icons.auto_awesome_rounded, color: colorScheme.primary),
             tooltip: 'On-Device AI Coach',
           ),
           IconButton(
             onPressed: () {
-              Navigator.of(context).push(
-                MaterialPageRoute(builder: (_) => const SettingsView()),
-              );
+              Navigator.of(
+                context,
+              ).push(MaterialPageRoute(builder: (_) => const SettingsView()));
             },
-            icon: Icon(Icons.settings_outlined, color: colorScheme.onSurfaceVariant),
+            icon: Icon(
+              Icons.settings_outlined,
+              color: colorScheme.onSurfaceVariant,
+            ),
             tooltip: 'Settings & Telemetry',
           ),
         ],
       ),
       endDrawer: const DeveloperDebugDrawer(),
-      body: IndexedStack(
-        index: _currentIndex,
-        children: _pages,
-      ),
+      body: IndexedStack(index: _currentIndex, children: _pages),
     );
   }
 }

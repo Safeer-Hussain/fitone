@@ -91,7 +91,13 @@ class DeveloperDebugDrawer extends StatelessWidget {
                       ),
                       value: monitor.forceApiError,
                       activeThumbColor: colorScheme.error,
-                      onChanged: (val) => monitor.setForceApiError(val),
+                      onChanged: (val) {
+                        monitor.setForceApiError(val);
+                        AppFeedback.showWarning(
+                          context,
+                          val ? 'API 503 error injection activated' : 'API 503 error injection deactivated',
+                        );
+                      },
                     ),
                   ),
                   Divider(color: colorScheme.outlineVariant),
@@ -108,7 +114,13 @@ class DeveloperDebugDrawer extends StatelessWidget {
                       ),
                       value: !monitor.isOnline,
                       activeThumbColor: const Color(0xFFF59E0B),
-                      onChanged: (val) => monitor.setManualOnlineState(!val),
+                      onChanged: (val) {
+                        monitor.setManualOnlineState(!val);
+                        AppFeedback.showInfo(
+                          context,
+                          val ? 'Simulating offline SQLite mode' : 'Simulating online network connection',
+                        );
+                      },
                     ),
                   ),
                   Divider(color: colorScheme.outlineVariant),
@@ -163,19 +175,28 @@ class DeveloperDebugDrawer extends StatelessWidget {
                         _TelemetryChip(
                           label: '500ms (High)',
                           isSelected: monitor.telemetryIntervalMs == 500,
-                          onTap: () => monitor.setTelemetryInterval(500),
+                          onTap: () {
+                            monitor.setTelemetryInterval(500);
+                            AppFeedback.showSuccess(context, 'Telemetry rate set to 500ms (High Fidelity)');
+                          },
                         ),
                         const SizedBox(width: 8),
                         _TelemetryChip(
                           label: '2000ms (Std)',
                           isSelected: monitor.telemetryIntervalMs == 2000,
-                          onTap: () => monitor.setTelemetryInterval(2000),
+                          onTap: () {
+                            monitor.setTelemetryInterval(2000);
+                            AppFeedback.showSuccess(context, 'Telemetry rate set to 2000ms (Standard)');
+                          },
                         ),
                         const SizedBox(width: 8),
                         _TelemetryChip(
                           label: '5000ms (Eco)',
                           isSelected: monitor.telemetryIntervalMs == 5000,
-                          onTap: () => monitor.setTelemetryInterval(5000),
+                          onTap: () {
+                            monitor.setTelemetryInterval(5000);
+                            AppFeedback.showSuccess(context, 'Telemetry rate set to 5000ms (Eco Battery)');
+                          },
                         ),
                       ],
                     ),

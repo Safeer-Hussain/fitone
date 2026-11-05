@@ -1,6 +1,7 @@
 import 'package:fl_chart/fl_chart.dart';
 import 'package:flutter/material.dart';
 import '../../../core/constants/app_typography.dart';
+import '../../../core/utils/app_feedback.dart';
 
 class EcgWaveformCard extends StatelessWidget {
   final List<double> ecgBuffer;
@@ -37,7 +38,9 @@ class EcgWaveformCard extends StatelessWidget {
       child: Card(
         margin: EdgeInsets.zero,
         clipBehavior: Clip.antiAlias,
-        child: Column(
+        child: InkWell(
+          onTap: () => _showEcgDiagnosticsSheet(context, colorScheme),
+          child: Column(
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
             Padding(
@@ -173,6 +176,111 @@ class EcgWaveformCard extends StatelessWidget {
           ],
         ),
       ),
+      ),
+    );
+  }
+
+  void _showEcgDiagnosticsSheet(BuildContext context, ColorScheme colorScheme) {
+    AppFeedback.showInfo(context, 'PPG / ECG Telemetry: $heartRate BPM • $spo2% SpO2 • $signalQuality% Signal');
+    showModalBottomSheet(
+      context: context,
+      isScrollControlled: true,
+      backgroundColor: Colors.transparent,
+      builder: (sheetContext) {
+        return SafeArea(
+          child: Container(
+            margin: const EdgeInsets.all(12),
+            decoration: BoxDecoration(
+              color: colorScheme.surface,
+              borderRadius: BorderRadius.circular(24),
+              border: Border.all(color: colorScheme.outlineVariant),
+            ),
+            child: Padding(
+              padding: const EdgeInsets.all(20),
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Center(
+                    child: Container(
+                      width: 40,
+                      height: 4,
+                      decoration: BoxDecoration(
+                        color: colorScheme.outlineVariant,
+                        borderRadius: BorderRadius.circular(2),
+                      ),
+                    ),
+                  ),
+                  const SizedBox(height: 16),
+                  Row(
+                    children: [
+                      Icon(Icons.monitor_heart_rounded, color: colorScheme.primary, size: 22),
+                      const SizedBox(width: 8),
+                      Text(
+                        'Live Optical PPG & ECG Telemetry',
+                        style: TextStyle(fontSize: 16, fontWeight: FontWeight.w700, color: colorScheme.onSurface),
+                      ),
+                    ],
+                  ),
+                  const SizedBox(height: 14),
+                  Container(
+                    padding: const EdgeInsets.all(14),
+                    decoration: BoxDecoration(
+                      color: colorScheme.surfaceContainerHighest,
+                      borderRadius: BorderRadius.circular(12),
+                      border: Border.all(color: colorScheme.outlineVariant),
+                    ),
+                    child: Column(
+                      children: [
+                        _buildDiagRow('Heart Rate', '$heartRate BPM', Icons.favorite_rounded, colorScheme),
+                        Divider(color: colorScheme.outlineVariant, height: 16),
+                        _buildDiagRow('Blood Oxygen (SpO2)', '$spo2%', Icons.water_drop_rounded, colorScheme),
+                        Divider(color: colorScheme.outlineVariant, height: 16),
+                        _buildDiagRow('Optical Signal Fidelity', '$signalQuality%', Icons.wifi_rounded, colorScheme),
+                        Divider(color: colorScheme.outlineVariant, height: 16),
+                        _buildDiagRow('Skin Temp Differential', '${skinTempDelta >= 0 ? '+' : ''}${skinTempDelta.toStringAsFixed(1)}°C', Icons.thermostat_rounded, colorScheme),
+                        Divider(color: colorScheme.outlineVariant, height: 16),
+                        _buildDiagRow('Active Telemetry Lead', 'Dual Ring Transceiver Lead I', Icons.cable_rounded, colorScheme),
+                      ],
+                    ),
+                  ),
+                  const SizedBox(height: 16),
+                  SizedBox(
+                    width: double.infinity,
+                    child: ElevatedButton(
+                      onPressed: () => Navigator.pop(sheetContext),
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: colorScheme.primary,
+                        foregroundColor: colorScheme.onPrimary,
+                      ),
+                      child: const Text('Close'),
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ),
+        );
+      },
+    );
+  }
+
+  Widget _buildDiagRow(String label, String value, IconData icon, ColorScheme colorScheme) {
+    return Row(
+      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+      children: [
+        Expanded(
+          child: Row(
+            children: [
+              Icon(icon, size: 16, color: colorScheme.primary),
+              const SizedBox(width: 8),
+              Flexible(child: Text(label, style: TextStyle(fontSize: 12, color: colorScheme.onSurface))),
+            ],
+          ),
+        ),
+        const SizedBox(width: 8),
+        Text(value, style: TextStyle(fontSize: 12, fontWeight: FontWeight.w700, color: colorScheme.onSurface)),
+      ],
     );
   }
 }

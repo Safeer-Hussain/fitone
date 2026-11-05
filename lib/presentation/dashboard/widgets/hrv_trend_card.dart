@@ -1,5 +1,6 @@
 import 'package:fl_chart/fl_chart.dart';
 import 'package:flutter/material.dart';
+import '../../../core/utils/app_feedback.dart';
 
 class HrvTrendCard extends StatelessWidget {
   final bool isCompact;
@@ -25,7 +26,10 @@ class HrvTrendCard extends StatelessWidget {
     const days = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];
 
     return Card(
-      child: Padding(
+      child: InkWell(
+        borderRadius: BorderRadius.circular(16),
+        onTap: () => _showHrvBreakdownSheet(context, colorScheme),
+        child: Padding(
         padding: EdgeInsets.all(isCompact ? 12 : 20),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
@@ -126,6 +130,103 @@ class HrvTrendCard extends StatelessWidget {
           ],
         ),
       ),
+      ),
+    );
+  }
+
+  void _showHrvBreakdownSheet(BuildContext context, ColorScheme colorScheme) {
+    AppFeedback.showInfo(context, 'HRV Autonomic Baseline: 64.4 ms RMSSD (+4.2 ms 7-day trend)');
+    showModalBottomSheet(
+      context: context,
+      isScrollControlled: true,
+      backgroundColor: Colors.transparent,
+      builder: (sheetContext) {
+        return SafeArea(
+          child: Container(
+            margin: const EdgeInsets.all(12),
+            decoration: BoxDecoration(
+              color: colorScheme.surface,
+              borderRadius: BorderRadius.circular(24),
+              border: Border.all(color: colorScheme.outlineVariant),
+            ),
+            child: Padding(
+              padding: const EdgeInsets.all(20),
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Center(
+                    child: Container(
+                      width: 40,
+                      height: 4,
+                      decoration: BoxDecoration(
+                        color: colorScheme.outlineVariant,
+                        borderRadius: BorderRadius.circular(2),
+                      ),
+                    ),
+                  ),
+                  const SizedBox(height: 16),
+                  Row(
+                    children: [
+                      Icon(Icons.graphic_eq_rounded, color: colorScheme.secondary, size: 22),
+                      const SizedBox(width: 8),
+                      Text(
+                        'Autonomic HRV Analytics',
+                        style: TextStyle(fontSize: 16, fontWeight: FontWeight.w700, color: colorScheme.onSurface),
+                      ),
+                    ],
+                  ),
+                  const SizedBox(height: 14),
+                  Container(
+                    padding: const EdgeInsets.all(14),
+                    decoration: BoxDecoration(
+                      color: colorScheme.surfaceContainerHighest,
+                      borderRadius: BorderRadius.circular(12),
+                      border: Border.all(color: colorScheme.outlineVariant),
+                    ),
+                    child: Column(
+                      children: [
+                        _buildHrvRow('7-Day Mean RMSSD', '64.4 ms', colorScheme),
+                        Divider(color: colorScheme.outlineVariant, height: 16),
+                        _buildHrvRow('SDNN Total Variability', '78.2 ms', colorScheme),
+                        Divider(color: colorScheme.outlineVariant, height: 16),
+                        _buildHrvRow('Autonomic Balance', 'Parasympathetic Dominant (Recovery)', colorScheme),
+                        Divider(color: colorScheme.outlineVariant, height: 16),
+                        _buildHrvRow('Weekly Trajectory', '+4.2 ms vs previous 14d rolling mean', colorScheme),
+                        Divider(color: colorScheme.outlineVariant, height: 16),
+                        _buildHrvRow('Stress Response Index', 'Low physiological sympathetic tone', colorScheme),
+                      ],
+                    ),
+                  ),
+                  const SizedBox(height: 16),
+                  SizedBox(
+                    width: double.infinity,
+                    child: ElevatedButton(
+                      onPressed: () => Navigator.pop(sheetContext),
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: colorScheme.primary,
+                        foregroundColor: colorScheme.onPrimary,
+                      ),
+                      child: const Text('Close'),
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ),
+        );
+      },
+    );
+  }
+
+  Widget _buildHrvRow(String label, String value, ColorScheme colorScheme) {
+    return Row(
+      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+      children: [
+        Expanded(child: Text(label, style: TextStyle(fontSize: 12, color: colorScheme.onSurfaceVariant))),
+        const SizedBox(width: 8),
+        Text(value, style: TextStyle(fontSize: 12, fontWeight: FontWeight.w700, color: colorScheme.onSurface)),
+      ],
     );
   }
 }

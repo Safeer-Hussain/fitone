@@ -107,4 +107,27 @@ class SocialStore {
 
     await socialRepository.createPost(newPost);
   }
+
+  Future<void> repostMilestone(SocialPost post) async {
+    final repost = SocialPost(
+      id: const Uuid().v4(),
+      userName: 'Safeer Hussain',
+      userHandle: '@safeer_h',
+      avatarInitials: 'SH',
+      postType: post.postType,
+      title: 'Repost: ${post.title}',
+      description: 'Shared from ${post.userName}: ${post.description}',
+      metrics: Map<String, dynamic>.from(post.metrics),
+      likesCount: 1,
+      isLiked: true,
+      comments: [],
+      timestamp: DateTime.now(),
+    );
+
+    runInAction(() {
+      _posts.insert(0, repost);
+    });
+
+    await socialRepository.createPost(repost);
+  }
 }

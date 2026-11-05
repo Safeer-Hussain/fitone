@@ -1,7 +1,11 @@
 import 'package:flutter/material.dart';
 import '../../../core/constants/app_assets.dart';
+import '../../../core/di/injection.dart';
+import '../../../core/utils/app_feedback.dart';
 import '../../../domain/entities/exercise.dart';
+import '../stores/workout_logger_store.dart';
 import '../widgets/one_rm_calculator_sheet.dart';
+import 'workout_logger_view.dart';
 
 class ExerciseDetailView extends StatelessWidget {
   final Exercise exercise;
@@ -41,12 +45,12 @@ class ExerciseDetailView extends StatelessWidget {
       ),
     );
 
-    Widget chipsSection = Row(
+    Widget chipsSection = Wrap(
+      spacing: 8,
+      runSpacing: 6,
       children: [
         _DetailChip(label: exercise.bodyPart, color: colorScheme.secondary),
-        const SizedBox(width: 8),
         _DetailChip(label: exercise.equipment, color: colorScheme.primary),
-        const SizedBox(width: 8),
         _DetailChip(label: exercise.difficulty, color: colorScheme.tertiary),
       ],
     );
@@ -101,16 +105,46 @@ class ExerciseDetailView extends StatelessWidget {
             style: TextStyle(fontSize: 14, color: colorScheme.onSurfaceVariant, height: 1.5),
           ),
         ),
-        const SizedBox(height: 28),
+        const SizedBox(height: 24),
         SizedBox(
           width: double.infinity,
           child: ElevatedButton.icon(
-            onPressed: () => OneRmCalculatorSheet.show(context),
-            icon: const Icon(Icons.calculate_rounded, size: 18),
-            label: const Text('Calculate 1RM & Overload Targets'),
+            key: const ValueKey('add_to_active_workout_button'),
+            onPressed: () {
+              final loggerStore = sl<WorkoutLoggerStore>();
+              if (!loggerStore.isSessionActive) {
+                loggerStore.startWorkout(title: '${exercise.name} Focused Workout');
+              }
+              Navigator.of(context).push(
+                MaterialPageRoute(
+                  builder: (_) => WorkoutLoggerView(initialExerciseId: exercise.id),
+                ),
+              );
+              AppFeedback.showSuccess(
+                context,
+                '${exercise.name} added to Active Workout session',
+              );
+            },
+            icon: const Icon(Icons.playlist_add_rounded, size: 20),
+            label: const Text('Add to Active Workout', style: TextStyle(fontWeight: FontWeight.w700)),
             style: ElevatedButton.styleFrom(
               backgroundColor: colorScheme.primary,
               foregroundColor: colorScheme.onPrimary,
+              padding: const EdgeInsets.symmetric(vertical: 14),
+              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+            ),
+          ),
+        ),
+        const SizedBox(height: 12),
+        SizedBox(
+          width: double.infinity,
+          child: OutlinedButton.icon(
+            onPressed: () => OneRmCalculatorSheet.show(context),
+            icon: const Icon(Icons.calculate_rounded, size: 18),
+            label: const Text('Calculate 1RM & Overload Targets'),
+            style: OutlinedButton.styleFrom(
+              foregroundColor: colorScheme.onSurface,
+              side: BorderSide(color: colorScheme.outlineVariant),
               padding: const EdgeInsets.symmetric(vertical: 14),
               shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
             ),

@@ -9,7 +9,9 @@ import '../widgets/one_rm_calculator_sheet.dart';
 import '../widgets/rest_timer_dialog.dart';
 
 class WorkoutLoggerView extends StatefulWidget {
-  const WorkoutLoggerView({super.key});
+  final String? initialExerciseId;
+
+  const WorkoutLoggerView({super.key, this.initialExerciseId});
 
   @override
   State<WorkoutLoggerView> createState() => _WorkoutLoggerViewState();
@@ -37,6 +39,9 @@ class _WorkoutLoggerViewState extends State<WorkoutLoggerView> {
     super.initState();
     _loggerStore = sl<WorkoutLoggerStore>();
     _exerciseStore = sl<ExerciseStore>();
+    if (widget.initialExerciseId != null) {
+      _selectedExerciseId = widget.initialExerciseId!;
+    }
     if (!_loggerStore.isSessionActive) {
       _loggerStore.startWorkout(title: 'Upper Hypertrophy Session');
     }

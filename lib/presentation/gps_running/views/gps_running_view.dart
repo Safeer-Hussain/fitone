@@ -4,6 +4,7 @@ import 'package:flutter_mobx/flutter_mobx.dart';
 import 'package:latlong2/latlong.dart';
 import '../../../core/di/injection.dart';
 import '../../../core/theme/theme_store.dart';
+import '../../../core/utils/app_feedback.dart';
 import '../stores/gps_running_store.dart';
 import '../widgets/run_summary_sheet.dart';
 import '../widgets/running_metrics_overlay.dart';
@@ -103,19 +104,29 @@ class _GpsRunningViewState extends State<GpsRunningView> {
             children: [
               if (isTracking) ...[
                 FloatingActionButton.small(
-                  heroTag: 'pause_btn',
-                  onPressed: isPaused ? () => _store.resumeRun() : () => _store.pauseRun(),
+                  heroTag: 'fab_gps_pause',
+                  onPressed: isPaused
+                      ? () {
+                          _store.resumeRun();
+                          AppFeedback.showSuccess(context, 'Run tracking resumed');
+                        }
+                      : () {
+                          _store.pauseRun();
+                          AppFeedback.showInfo(context, 'Run tracking paused');
+                        },
                   backgroundColor: colorScheme.surface,
                   foregroundColor: colorScheme.primary,
+                  tooltip: isPaused ? 'Resume Run' : 'Pause Run',
                   child: Icon(isPaused ? Icons.play_arrow_rounded : Icons.pause_rounded),
                 ),
-                const SizedBox(width: 16),
+                const SizedBox(width: 12),
                 FloatingActionButton.extended(
-                  heroTag: 'stop_btn',
+                  heroTag: 'fab_gps_stop',
                   onPressed: () async {
                     final record = await _store.finishAndSaveRun();
                     if (record != null && context.mounted) {
                       RunSummarySheet.show(context, record);
+                      AppFeedback.showSuccess(context, 'Run completed and recorded to database');
                     }
                   },
                   backgroundColor: colorScheme.error,
@@ -123,11 +134,25 @@ class _GpsRunningViewState extends State<GpsRunningView> {
                   icon: const Icon(Icons.stop_rounded, size: 18),
                   label: const Text('Finish Run', style: TextStyle(fontWeight: FontWeight.w700, fontSize: 13)),
                 ),
+                const SizedBox(width: 12),
+                FloatingActionButton.small(
+                  heroTag: 'fab_gps_reset',
+                  onPressed: () {
+                    _store.cancelRun();
+                    AppFeedback.showInfo(context, 'Run tracking discarded and reset');
+                  },
+                  backgroundColor: colorScheme.surface,
+                  foregroundColor: colorScheme.error,
+                  tooltip: 'Discard & Reset Run',
+                  child: const Icon(Icons.refresh_rounded),
+                ),
               ] else ...[
                 FloatingActionButton.extended(
-                  heroTag: 'start_run_btn',
+                  heroTag: 'fab_gps_start',
                   onPressed: () {
                     _store.startSimulatedRun();
+                    _mapController.move(_initialLahoreCenter, 15.0);
+                    AppFeedback.showSuccess(context, 'GPS run tracking started (Lahore route)');
                   },
                   backgroundColor: colorScheme.primary,
                   foregroundColor: colorScheme.onPrimary,
@@ -172,6 +197,7 @@ class _GpsRunningViewState extends State<GpsRunningView> {
                                   onPressed: () {
                                     _store.startSimulatedRun();
                                     _mapController.move(_initialLahoreCenter, 15.0);
+                                    AppFeedback.showSuccess(context, 'GPS run tracking started (Lahore route)');
                                   },
                                   icon: const Icon(Icons.play_circle_filled_rounded, size: 16),
                                   label: const Text('Simulate Run (Lahore)', style: TextStyle(fontSize: 12)),
@@ -182,6 +208,21 @@ class _GpsRunningViewState extends State<GpsRunningView> {
                                   ),
                                 ),
                               ),
+                            Positioned(
+                              right: 12,
+                              bottom: 12,
+                              child: FloatingActionButton.small(
+                                heroTag: 'fab_gps_recenter_land',
+                                onPressed: () {
+                                  _mapController.move(currentPos, 15.5);
+                                  AppFeedback.showInfo(context, 'Map centered to current location');
+                                },
+                                backgroundColor: colorScheme.surface,
+                                foregroundColor: colorScheme.primary,
+                                tooltip: 'Recenter Map',
+                                child: const Icon(Icons.my_location_rounded, size: 18),
+                              ),
+                            ),
                           ],
                         ),
                       ),
@@ -220,6 +261,7 @@ class _GpsRunningViewState extends State<GpsRunningView> {
                               onPressed: () {
                                 _store.startSimulatedRun();
                                 _mapController.move(_initialLahoreCenter, 15.0);
+                                AppFeedback.showSuccess(context, 'GPS run tracking started (Lahore route)');
                               },
                               icon: const Icon(Icons.play_circle_filled_rounded, size: 18),
                               label: const Text('Simulate Run (Lahore)'),
@@ -229,6 +271,21 @@ class _GpsRunningViewState extends State<GpsRunningView> {
                                 elevation: 4,
                               ),
                             ),
+                    ),
+                    Positioned(
+                      right: 16,
+                      bottom: 96,
+                      child: FloatingActionButton.small(
+                        heroTag: 'fab_gps_recenter',
+                        onPressed: () {
+                          _mapController.move(currentPos, 15.5);
+                          AppFeedback.showInfo(context, 'Map centered to current location');
+                        },
+                        backgroundColor: colorScheme.surface,
+                        foregroundColor: colorScheme.primary,
+                        tooltip: 'Recenter Map',
+                        child: const Icon(Icons.my_location_rounded, size: 18),
+                      ),
                     ),
                     Positioned(
                       bottom: 24,
