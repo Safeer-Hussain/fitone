@@ -118,7 +118,15 @@ class GpsRunningStore {
       _isTracking.value = true;
       _isSimulating.value = true;
       _isPaused.value = false;
-      _coordinates.add(_lahoreTrack.first);
+      _coordinates.add(
+        RunCoordinate(
+          _lahoreTrack.first.lat,
+          _lahoreTrack.first.lng,
+          elevation: 215.0,
+          timestamp: DateTime.now(),
+          heartRate: _currentHeartRate.value,
+        ),
+      );
     });
 
     _simulationIndex = 0;
@@ -135,7 +143,15 @@ class GpsRunningStore {
         // Advance polyline coordinate every 3 seconds
         if (_elapsedSeconds.value % 3 == 0) {
           _simulationIndex = (_simulationIndex + 1) % _lahoreTrack.length;
-          _coordinates.add(_lahoreTrack[_simulationIndex]);
+          _coordinates.add(
+            RunCoordinate(
+              _lahoreTrack[_simulationIndex].lat,
+              _lahoreTrack[_simulationIndex].lng,
+              elevation: 215.0 + _elevationGainM.value,
+              timestamp: DateTime.now(),
+              heartRate: _currentHeartRate.value,
+            ),
+          );
         }
 
         // Add 1km split every 1.0 km

@@ -6,6 +6,7 @@ import '../../../core/di/injection.dart';
 import '../../../core/theme/theme_store.dart';
 import '../../../core/utils/app_feedback.dart';
 import '../stores/gps_running_store.dart';
+import '../widgets/gpx_export_dialog.dart';
 import '../widgets/run_summary_sheet.dart';
 import '../widgets/running_metrics_overlay.dart';
 
@@ -382,9 +383,21 @@ class _GpsRunningViewState extends State<GpsRunningView> {
                                   overflow: TextOverflow.ellipsis,
                                   style: TextStyle(fontSize: 12, color: colorScheme.onSurfaceVariant),
                                 ),
-                                trailing: Text(
-                                  '${r.caloriesBurned.toStringAsFixed(0)} kcal',
-                                  style: TextStyle(fontWeight: FontWeight.w700, color: colorScheme.tertiary),
+                                trailing: Row(
+                                  mainAxisSize: MainAxisSize.min,
+                                  children: [
+                                    Text(
+                                      '${r.caloriesBurned.toStringAsFixed(0)} kcal',
+                                      style: TextStyle(fontWeight: FontWeight.w700, color: colorScheme.tertiary),
+                                    ),
+                                    const SizedBox(width: 4),
+                                    IconButton(
+                                      key: ValueKey('export_gpx_history_${r.id}'),
+                                      icon: Icon(Icons.share_location_rounded, color: colorScheme.primary, size: 20),
+                                      tooltip: 'Export GPX Route',
+                                      onPressed: () => GpxExportDialog.show(context, r),
+                                    ),
+                                  ],
                                 ),
                               ),
                             );

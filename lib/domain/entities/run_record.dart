@@ -3,17 +3,37 @@ import 'dart:convert';
 class RunCoordinate {
   final double lat;
   final double lng;
+  final double? elevation;
+  final DateTime? timestamp;
+  final int? heartRate;
 
-  const RunCoordinate(this.lat, this.lng);
+  const RunCoordinate(
+    this.lat,
+    this.lng, {
+    this.elevation,
+    this.timestamp,
+    this.heartRate,
+  });
 
   factory RunCoordinate.fromMap(Map<String, dynamic> map) {
     return RunCoordinate(
       (map['lat'] as num).toDouble(),
       (map['lng'] as num).toDouble(),
+      elevation: (map['elevation'] as num?)?.toDouble() ?? (map['ele'] as num?)?.toDouble(),
+      timestamp: map['timestamp'] != null
+          ? DateTime.tryParse(map['timestamp'] as String)
+          : (map['time'] != null ? DateTime.tryParse(map['time'] as String) : null),
+      heartRate: (map['heartRate'] as num?)?.toInt() ?? (map['hr'] as num?)?.toInt(),
     );
   }
 
-  Map<String, dynamic> toMap() => {'lat': lat, 'lng': lng};
+  Map<String, dynamic> toMap() => {
+        'lat': lat,
+        'lng': lng,
+        if (elevation != null) 'elevation': elevation,
+        if (timestamp != null) 'timestamp': timestamp!.toIso8601String(),
+        if (heartRate != null) 'heartRate': heartRate,
+      };
 }
 
 class RunSplit {

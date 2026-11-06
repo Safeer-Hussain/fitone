@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import '../../../domain/entities/run_record.dart';
+import 'gpx_export_dialog.dart';
 
 class RunSummarySheet extends StatelessWidget {
   final RunRecord record;
@@ -72,6 +73,13 @@ class RunSummarySheet extends StatelessWidget {
                       ],
                     ),
                   ),
+                  IconButton(
+                    key: const ValueKey('export_gpx_header_button'),
+                    icon: Icon(Icons.share_location_rounded, color: colorScheme.primary, size: 24),
+                    tooltip: 'Export GPX Route',
+                    onPressed: () => GpxExportDialog.show(context, record),
+                  ),
+                  const SizedBox(width: 4),
                   Icon(Icons.check_circle_rounded, color: colorScheme.primary, size: 28),
                 ],
               ),
@@ -159,17 +167,35 @@ class RunSummarySheet extends StatelessWidget {
                       ),
               ),
               const SizedBox(height: 12),
-              SizedBox(
-                width: double.infinity,
-                child: ElevatedButton(
-                  onPressed: () => Navigator.of(context).pop(),
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: colorScheme.primary,
-                    foregroundColor: colorScheme.onPrimary,
-                    padding: const EdgeInsets.symmetric(vertical: 14),
+              Row(
+                children: [
+                  Expanded(
+                    child: OutlinedButton.icon(
+                      key: const ValueKey('export_gpx_button'),
+                      onPressed: () => GpxExportDialog.show(context, record),
+                      icon: const Icon(Icons.share_location_rounded, size: 18),
+                      label: const Text('Export GPX'),
+                      style: OutlinedButton.styleFrom(
+                        padding: const EdgeInsets.symmetric(vertical: 14),
+                        side: BorderSide(color: colorScheme.outlineVariant),
+                        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                      ),
+                    ),
                   ),
-                  child: const Text('Close Summary', style: TextStyle(fontWeight: FontWeight.w700)),
-                ),
+                  const SizedBox(width: 12),
+                  Expanded(
+                    child: ElevatedButton(
+                      onPressed: () => Navigator.of(context).pop(),
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: colorScheme.primary,
+                        foregroundColor: colorScheme.onPrimary,
+                        padding: const EdgeInsets.symmetric(vertical: 14),
+                        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                      ),
+                      child: const Text('Close', style: TextStyle(fontWeight: FontWeight.w700)),
+                    ),
+                  ),
+                ],
               ),
             ],
           ),

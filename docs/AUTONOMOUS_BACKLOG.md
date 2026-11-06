@@ -9,7 +9,7 @@ This document maintains 25 high-value engineering upgrades for the Fitone mobile
 - [x] **Sprint 01: Barbell Plate Loading Calculator**
   - Implement a visual Olympic barbell plate loading calculator (45lb / 20kg bar + 25kg, 20kg, 15kg, 10kg, 5kg, 2.5kg, 1.25kg plates) that calculates exact plate configurations per side for any target weight. Add unit tests for odd and standard loads.
 
-- [ ] **Sprint 02: GPX Route Exporter**
+- [x] **Sprint 02: GPX Route Exporter**
   - Add standard GPX 1.1 XML generation for completed GPS running routes stored in SQLite, allowing runners to export route coordinates, timestamps, and elevation points to file storage or share intent.
 
 - [ ] **Sprint 03: Intermittent Fasting Window Tracker**
